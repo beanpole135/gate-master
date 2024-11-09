@@ -37,6 +37,9 @@ func main() {
 		fmt.Println("Could not create Camera:", err)
 		return
 	}
+	defer Cam.Close()
+
+	//Setup the pages / endpoints
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
 	http.HandleFunc("/login", makeHandler(loginHandler))
 	http.HandleFunc("/stream", Cam.ServeImages)
