@@ -22,7 +22,7 @@ type Account struct {
 	TimeModified time.Time
 }
 
-func (D *Database) CreateAHTable() error {
+func (D *Database) CreateAccTable() error {
 	q := `create table if not exists account (
 account_id integer primary key autoincrement,
 first_name text not null,

@@ -40,6 +40,14 @@ func (D *Database) TablesExist() bool {
 }
 
 func (D *Database) CreateTables() error {
+	err := D.CreateAccTable()
+	if err != nil {
+		return err
+	}
+	err = D.CreateACTable()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
