@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
 const PageTitle = "Shadow Mountain"
@@ -24,20 +25,55 @@ type Page struct {
 
 var templates *template.Template
 var Cam *Camera
+var DB *Database
+
+func exitErr(err error, msg string) {
+	if err != nil {
+		fmt.Println(fmt.Sprintf(msg, err))
+		os.Exit(1)
+	}
+}
 
 func main() {
 	var err error
 	templates, err = template.ParseFS(htmlFS, "html/*.html")
-	if err != nil {
-		fmt.Println("Could not load Templates:", err)
-		return
-	}
+	exitErr(err, "Could not load Templates: %v")
+
+	//Setup the Camera
 	Cam, err := NewCamera()
-	if err != nil {
-		fmt.Println("Could not create Camera:", err)
-		return
-	}
+	exitErr(err, "Could not create Camera: %v")
 	defer Cam.Close()
+
+	//Setup the Database
+	DB, err = NewDatabase("test.sqlite")
+	exitErr(err, "Could not create database: %v")
+	defer DB.Close()
+
+	//Sample to test the database system
+	/*A := Account{
+		FirstName: "FTest",
+		LastName: "LTest",
+		Username: "TESTUSER",
+		PwHash: "password",
+	}
+	acc, err := DB.AccountInsert(&A)
+	exitErr(err, "Cannot insert DB record: %v")
+
+	a, err := DB.AccountsSelectAll()
+	exitErr(err, "Could not load accounts: %v")
+	if len(a) < 1 {
+		fmt.Println("Account not loaded")
+		os.Exit(1)
+	}
+	fmt.Println(fmt.Sprintf("Got Accounts: %v", a))
+	a[0].FirstName = "FName2"
+	acc, err = DB.AccountUpdate(&a[0])
+	exitErr(err, "Could not update account: %v")
+
+	acc, err = DB.AccountForUsernamePassword("TESTUSER","password")
+	exitErr(err, "Could not find username with password: %v")
+	fmt.Println(fmt.Sprintf("Got account %v", acc))
+	*/
 
 	//Setup the pages / endpoints
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))

@@ -31,7 +31,7 @@ username text not null unique,
 pw_hash text not null,
 account_status integer not null,
 time_created integer not null,
-time_modified integer
+time_modified integer not null
 	);`
 	_, err := D.ExecSql(q)
 	return err
@@ -63,10 +63,10 @@ func (D *Database) AccountInsert(acc *Account) (*Account, error) {
 		acc.AccountStatus = Account_Active
 	}
 
-	q := `insert into account (first_name, last_name, username, pw_hash, account_status, time_created) values
-		(?, ?, ?, ?, ?, ?)
+	q := `insert into account (first_name, last_name, username, pw_hash, account_status, time_created, time_modified) values
+		(?, ?, ?, ?, ?, ?, ?)
 		returning account_id;`
-	rslt, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.PwHash, acc.AccountStatus, D.TimeNow())
+	rslt, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.PwHash, acc.AccountStatus, D.TimeNow(), D.TimeNow())
 	if err != nil {
 		return nil, err
 	}
@@ -79,19 +79,33 @@ func (D *Database) AccountUpdate(acc *Account) (*Account, error) {
 		return nil, fmt.Errorf("Missing Account ID for UpdateAccount")
 	}
 	acc.TimeModified = time.Now()
-	q := `update account set 
-	first_name = ?,
-	last_name = ?,
-	username = ?,
-	pw_hash = ?,
-	account_status = ?,
-	time_modified = ?
-	where account_id = ?;`
-	_, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.PwHash, acc.AccountStatus, D.TimeNow(), acc.AccountID)
-	if err != nil {
-		return nil, err
+	if acc.PwHash != "" {
+		q := `update account set 
+		first_name = ?,
+		last_name = ?,
+		username = ?,
+		pw_hash = ?,
+		account_status = ?,
+		time_modified = ?
+		where account_id = ?;`
+		_, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.PwHash, acc.AccountStatus, D.TimeNow(), acc.AccountID)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		q := `update account set 
+		first_name = ?,
+		last_name = ?,
+		username = ?,
+		account_status = ?,
+		time_modified = ?
+		where account_id = ?;`
+		_, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.AccountStatus, D.TimeNow(), acc.AccountID)
+		if err != nil {
+			return nil, err
+		}		
 	}
-	return acc, err
+	return acc, nil
 }
 
 func (D *Database) AccountsSelectAll() ([]Account, error) {
@@ -114,7 +128,7 @@ func (D *Database) AccountForUsernamePassword(u string, phash string) (*Account,
 		return nil, err2
 	}
 	if len(accounts) != 1 {
-		return nil, fmt.Errorf("Invalid Username/Password")
+		return nil, fmt.Errorf("Invalid Username/Password: %v", accounts)
 	}
 	//Got a valid account - return it
 	return &accounts[0], nil

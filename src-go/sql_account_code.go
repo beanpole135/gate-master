@@ -41,7 +41,7 @@ time_start integer,
 time_end integer,
 valid_days text,
 time_created integer not null,
-time_modified integer
+time_modified integer not null
 	);`
 	_, err := D.ExecSql(q)
 	return err
@@ -111,8 +111,9 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		time_start,
 		time_end,
 		valid_days,
-		time_created) values
-		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		time_created,
+		time_modified) values
+		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		returning account_code_id;`
 	rslt, err := D.ExecSql(q, 
 		acc.AccountID,
@@ -126,7 +127,9 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		D.ToTime(acc.TimeStart),
 		D.ToTime(acc.TimeEnd),
 		combineVDays(acc.ValidDays),
-		D.TimeNow())
+		D.TimeNow(),
+		D.TimeNow()
+	)
 	if err != nil {
 		return nil, err
 	}
