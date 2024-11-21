@@ -9,6 +9,7 @@ import (
 const (
 	Account_Active = 1
 	Account_Inactive = 2
+	Account_Admin = 3
 )
 
 type Account struct {
