@@ -42,31 +42,15 @@ func (AC *AccountCode) IsValid() bool {
 		}
 	}
 	//Check valid day of the week (if set)
-	if len(AC.ValidDays) > 0 {
-		day := weekday(now)
-		isvalid := false
-		for _, vd := range AC.ValidDays {
-			if vd == day {
-				isvalid = true
-				break
-			}
-		}
-		if !isvalid {
-			return false
-		}
+	if !nowValidWeekday(AC.ValidDays) {
+		return false
 	}
+
 	//Now check valid time of day (if BOTH are set)
-	if !AC.TimeStart.IsZero() && !AC.TimeEnd.IsZero() {
-		if AC.TimeStart.Hour() < AC.TimeEnd.Hour() {
-			//Time frame within same day (end hour larger than start hour)
-
-		} else {
-			//Time frame crosses into the next day
-			// (end hour earlier than start hour)
-
-		}
+	if !nowBetweenTimes(AC.TimeStart, AC.TimeEnd) {
+		return false
 	}
-	return true //ALl validity checks passed
+	return true //All validity checks passed
 }
 
 func (D *Database) CreateACTable() error {
@@ -101,18 +85,6 @@ func splitVDays(days string) []string {
 	return strings.Split(days, ",")
 }
 
-func weekday(T time.Time) string {
-	switch T.Weekday() {
-	case time.Sunday: return "su"
-	case time.Monday: return "mo"
-	case time.Tuesday: return "tu"
-	case time.Wednesday: return "we"
-	case time.Thursday: return "th"
-	case time.Friday: return "fr"
-	case time.Saturday: return "sa"
-	}
-	return ""
-}
 
 // internal function to read the rows from the account_code table
 var accountCodeSelect = `select account_code_id, account_id, code, label, is_active, is_utility, is_delivery, date_start, date_end, time_start, time_end, valid_days, time_created, time_modified
