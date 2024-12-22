@@ -13,6 +13,8 @@ type Database struct {
 	db *sql.DB
 }
 
+var blankdatabase bool = false
+
 func NewDatabase(filepath string) (*Database, error) {
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil { return nil, err }
@@ -35,11 +37,16 @@ func (D *Database) Close() {
 }
 
 func (D *Database) TablesExist() bool {
-
+	list, err := D.AccountsSelectAll()
+	if err == nil && len(list) > 0 {
+		blankdatabase = false
+		return true
+	}
 	return false
 }
 
 func (D *Database) CreateTables() error {
+	blankdatabase = true
 	err := D.CreateAccTable()
 	if err != nil {
 		return err

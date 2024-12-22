@@ -25,6 +25,6 @@ func (C *Camera) Close() {
 	
 }
 
-func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request) {
+func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
 	
 }

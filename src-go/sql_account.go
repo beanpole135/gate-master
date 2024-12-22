@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -12,8 +14,16 @@ const (
 	Account_Admin = 3
 )
 
+func hashPassword(pw string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return string(hash)
+}
+
 type Account struct {
-	AccountID int64
+	AccountID int32
 	FirstName string
 	LastName string
 	Username string
@@ -71,7 +81,8 @@ func (D *Database) AccountInsert(acc *Account) (*Account, error) {
 	if err != nil {
 		return nil, err
 	}
-	acc.AccountID, err = rslt.LastInsertId()
+	recordId, err := rslt.LastInsertId()
+	acc.AccountID = int32(recordId)
 	return acc, err
 }
 
@@ -119,6 +130,14 @@ func (D *Database) AccountsSelectAll() ([]Account, error) {
 }
 
 func (D *Database) AccountForUsernamePassword(u string, phash string) (*Account, error) {
+	if blankdatabase && u == "admin" {
+		return &Account{
+			AccountID: -1,
+			FirstName: "admin",
+			LastName: "admin",
+			AccountStatus: Account_Admin,
+		}, nil
+	}
 	q := accountSelect + " where username = ? and pw_hash = ?;"
 	rows, err := D.QuerySql(q, u, phash)
 	if err != nil {

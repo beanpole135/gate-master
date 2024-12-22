@@ -1,21 +1,12 @@
-<html lang="en" data-theme="dark">
-
-<head>
-  <meta charset="UTF-8">
-  <title>{{.Title}}</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <script type="text/javascript" src="/static/script.js"></script>
-</head>
-<body>
-  <div class="login-page">
+{{template "header"}}
+  <div class="login-page" id="mainbody">
     <div class="form">
       <p>{{.Title}}</p>
       <form class="login-form">
-        <input type="text" placeholder="username"/>
-        <input type="password" placeholder="password"/>
-        <button>login</button>
+        <input type="text" id="uname" name="uname" placeholder="username"/>
+        <input type="password" id="passw" name="passw" placeholder="password"/>
+        <button hx-post="/auth-login" hx-include="#uname, #passw" hx-target="#mainbody" hx-swap="outerHTML">Login</button>
       </form>
     </div>
   </div>
-</body>
-</html>
+{{template "footer"}}

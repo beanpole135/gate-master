@@ -44,7 +44,7 @@ func (C *Camera) Close() {
 	C.CamDevice.Close()
 }
 
-func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request) {
+func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
 	mimeWriter := multipart.NewWriter(w)
 	w.Header().Set("Content-Type", fmt.Sprintf("multipart/x-mixed-replace; boundary=%s", mimeWriter.Boundary()))
 	partHeader := make(textproto.MIMEHeader)
