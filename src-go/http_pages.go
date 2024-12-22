@@ -10,6 +10,9 @@ func setupPages() {
 	http.HandleFunc("/auth-login", checkToken(performLoginHandler, false))
 	http.HandleFunc("/auth-logout", checkToken(performLogoutHandler, true))
 	http.HandleFunc("/gate", checkToken(gatePageHandler, true))
+	http.HandleFunc("/page-view", checkToken(tab_gateHandler, true))
+	http.HandleFunc("/page-accounts", checkToken(tab_accountsHandler, true))
+	http.HandleFunc("/page-profile", checkToken(tab_profileHandler, true))
 }
 
 // Page Handlers
@@ -59,6 +62,20 @@ func performLogoutHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 }
 
 func gatePageHandler(w http.ResponseWriter, r *http.Request, p *Page) {
-	fmt.Println("Gate Page Handler")
 	renderTemplate(w, "gate", p)
+}
+
+func tab_gateHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	fmt.Println("Gate Tab Handler")
+	renderTemplate(w, "tab_gate", p)
+}
+
+func tab_accountsHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	fmt.Println("Gate Tab Handler")
+	renderTemplate(w, "tab_accounts", p)
+}
+
+func tab_profileHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	fmt.Println("Gate Tab Handler")
+	renderTemplate(w, "tab_profile", p)
 }

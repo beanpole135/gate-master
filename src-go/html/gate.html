@@ -1,6 +1,12 @@
   <div class="gate-page">
     <div class="topbar">
-      <button hx-post="/auth-logout">Logout</button>
+      <button hx-post="/page-view" hx-trigger="click,load" hx-target="#pagediv" hx-swap="innerHTML">Gate</button>
+      {{if .Token.IsAdmin}}
+      <button hx-post="/page-accounts" hx-target="#pagediv" hx-swap="innerHTML">Accounts</button>
+      {{end}}
+      <button hx-post="/auth-logout" style="float: right;">Logout</button>
+      <button hx-post="/page-profile" hx-target="#pagediv" hx-swap="innerHTML" style="float: right;">Settings</button>
     </div>
-    Content goes here!!
+    <div class="main" id="pagediv">
+    </div>
   </div>

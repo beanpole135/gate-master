@@ -5,6 +5,26 @@
   padding: 8% 0 0;
   margin: auto;
 }
+
+.topbar {
+  overflow: hidden;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.5ex 0;
+  max-height: 25px;
+}
+.topbar button {
+  float: left;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+.main {
+  margin-top: 30px; /*leave room for topbar*/
+}
 .form {
   position: relative;
   z-index: 1;
