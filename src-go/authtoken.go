@@ -83,11 +83,15 @@ func ReadSignedToken(tok string, jwtSecretKey string, checkTime bool) (AuthToken
 			return ct, fmt.Errorf("invalid token")
 		}
 	}
-
 	// At this point, we verified we have a valid token - now pull the info into the CurrentToken struct
 	// Dev Note: This mapping needs to 100% match the token generation routine otherwise we get weird errors
-	ct.UserId, _ = claims["aud"].(int32)
+	ct.UserId, _ = parseClaimInt(claims["aud"])
 	ct.IsAdmin, _ = claims["iad"].(bool)
-
 	return ct, nil
+}
+
+func parseClaimInt(val interface{}) (int32, bool) {
+	//Numeric claims always get detected as floats for some reason
+	f, err := val.(float64)
+	return int32(f), err
 }

@@ -33,6 +33,18 @@ type Account struct {
 	TimeModified time.Time
 }
 
+func DefaultAdminAccount() *Account {
+return &Account{
+			AccountID: -1,
+			FirstName: "admin",
+			LastName: "admin",
+			Username: "admin",
+			AccountStatus: Account_Admin,
+			TimeCreated: time.Now(),
+			TimeModified: time.Now(),
+		}
+}
+
 func (D *Database) CreateAccTable() error {
 	q := `create table if not exists account (
 account_id integer primary key autoincrement,
@@ -129,14 +141,25 @@ func (D *Database) AccountsSelectAll() ([]Account, error) {
 	return D.parseAccountRows(rows)
 }
 
+func (D *Database) AccountFromID(accountId int32) (*Account, error) {
+	if accountId == -1 {
+		return DefaultAdminAccount(), nil
+	}
+	q := accountSelect + " where account_id = ?;"
+	rows, err := D.QuerySql(q, accountId)
+	if err != nil {
+		return nil, err
+	}
+	list, err := D.parseAccountRows(rows)
+	if len(list) >= 1 {
+		return &list[0], err
+	}
+	return nil, err
+}
+
 func (D *Database) AccountForUsernamePassword(u string, phash string) (*Account, error) {
 	if blankdatabase && u == "admin" {
-		return &Account{
-			AccountID: -1,
-			FirstName: "admin",
-			LastName: "admin",
-			AccountStatus: Account_Admin,
-		}, nil
+		return DefaultAdminAccount(), nil
 	}
 	q := accountSelect + " where username = ? and pw_hash = ?;"
 	rows, err := D.QuerySql(q, u, phash)

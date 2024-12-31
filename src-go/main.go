@@ -24,6 +24,8 @@ var htmlFS embed.FS
 type Page struct {
 	Title string
 	Token *AuthToken
+	Profile *Account
+	Accounts []Account
 }
 
 var templates *template.Template

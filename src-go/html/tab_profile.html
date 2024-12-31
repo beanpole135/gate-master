@@ -1,3 +1,26 @@
-<div>
-Profiles Tab!!
+<div id="profiletab">
+<form class="grid-form">
+	<h2 style="grid-column: 1 / span 2;">Profile Information</h2>
+	<label for="fname">First Name:</label>
+	<input type="text" id="fname" value="{{.Profile.FirstName}}" required>
+	<label for="lname">Last Name:</label>
+	<input type="text" id="lname" value="{{.Profile.LastName}}" required>
+	<label for="datecreated">Account Created:</label>
+	<p id="datecreated">{{.Profile.TimeCreated.Format "Jan 02, 2006 15:04:05 MST"}}</p>
+	<label for="datemod">Last Updated:</label>
+	<p id="datemod">{{.Profile.TimeModified.Format "Jan 02, 2006 15:04:05 MST"}}</p>
+	<button hx-post="/profile-update" hx-target="#profiletab" hx-swap="outerHTML" style="grid-column: 1 / span 2;">Update Info </button>
+</form>
+<br>
+<form class="grid-form">
+	<h2 style="grid-column: 1 / span 2;">Password Change</h2>
+	<label for="oldpw">Current Password:</label>
+	<input id="oldpw" type="password">
+	<label for="newpw">New Password:</label>
+	<input id="newpw" type="password">
+	<label for="newpw2">New Password (repeat):</label>
+	<input id="newpw2" type="password">
+	<button hx-post="/profile-pwreset" hx-target="#profiletab" hx-swap="outerHTML" style="grid-column: 1 / span 2;">Change Password</button>
+</form>
+
 </div>
