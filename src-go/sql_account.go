@@ -33,6 +33,19 @@ type Account struct {
 	TimeModified time.Time
 }
 
+func (A Account) Status() string {
+	switch A.AccountStatus {
+	case Account_Active:
+		return "Active"
+	case Account_Inactive:
+		return "Inactive"
+	case Account_Admin:
+		return "Admin"
+	default:
+		return "Unknown"
+	}
+}
+
 func DefaultAdminAccount() *Account {
 return &Account{
 			AccountID: -1,

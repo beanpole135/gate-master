@@ -85,7 +85,7 @@ func main() {
 
 	//Setup the pages / endpoints
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
-	http.HandleFunc("/stream", checkToken(Cam.ServeImages, true))
+	http.HandleFunc("/stream", checkToken(Cam.ServeImages, true, false))
 	http.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.png", http.StatusSeeOther))
 	// Individual Pages
 	setupPages()
@@ -110,7 +110,7 @@ func handleError(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
-func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToken bool) http.HandlerFunc {
+func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToken bool, adminonly bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := &Page{
 			Title: PageTitle,
@@ -128,9 +128,19 @@ func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToke
 				handleError(w, r)
 				return
 			}
+			if adminonly && !tok.IsAdmin {
+				handleError(w, r)
+				return
+			}
 			p.Token = &tok
 		}
 		//Now load the page
 		fn(w, r, p)
 	}
+}
+
+func returnError(w http.ResponseWriter, msg string) {
+	fmt.Println("Got error to return:", msg)
+	w.Header().Add("HX-Trigger", fmt.Sprintf(`{"showError": "%s"}`, msg))
+	http.Error(w, msg, http.StatusBadRequest)
 }

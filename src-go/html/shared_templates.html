@@ -11,6 +11,20 @@
 {{end}}
 
 {{define "footer"}}
+<div id="errorbox">
+  <h3><i>WARNING</i></h3>
+  <p id="errortext">Some text here!!</p>
+</div>
 </body>
 </html>
+
+<script>
+  document.body.addEventListener("showError", function(evt){
+   document.getElementById('errortext').innerHTML = evt.detail.value;
+   document.getElementById('errorbox').style.opacity = 1;
+   setTimeout(function () { 
+      document.getElementById('errorbox').style.opacity = 0;
+   }, 2000);
+  });
+</script>
 {{end}}
