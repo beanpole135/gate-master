@@ -7,6 +7,15 @@ import (
 	"time"
 )
 
+func validatePinCodeFormat(p string) bool {
+    for _, v := range p {
+    	//This checks each character for a numeric value (0-9)
+		if v < '0' || v > '9' {
+            return false
+        }
+    }
+    return len(p) >= 4
+}
 type AccountCode struct {
 	AccountCodeID int64
 	AccountID int64
@@ -24,6 +33,66 @@ type AccountCode struct {
 	//Internal audit fields
 	TimeCreated time.Time
 	TimeModified time.Time
+}
+
+func (A AccountCode) Status() string {
+	if A.IsActive {
+		return "Active"
+	}
+	return "Inactive"
+}
+
+func (A AccountCode) TagsString() string {
+	var tags []string
+	if A.IsUtility {
+		tags = append(tags, "Utility")
+	}
+	if A.IsDelivery {
+		tags = append(tags, "Delivery")
+	}
+	return strings.Join(tags,", ")
+}
+
+func (A AccountCode) HasDay(d string) bool {
+  if len(A.ValidDays) < 1 || len(A.ValidDays) > 6 {
+  	return true
+  }
+  for _, v := range A.ValidDays {
+  	if v == d {
+  		return true
+  	}
+  }
+  return false
+}
+
+func (AC AccountCode) WhenValidString() string {
+	var lines []string
+	datefmt := "Jan _2, 2006"
+	timefmt := "3:04PM"
+	//Valid dates
+	if !AC.DateStart.IsZero() && !AC.DateEnd.IsZero() {
+		lines = append(lines, AC.DateStart.Format(datefmt)+" to "+AC.DateEnd.Format(datefmt))
+	} else if !AC.DateStart.IsZero() {
+		lines = append(lines, "After "+AC.DateStart.Format(datefmt))
+	} else if !AC.DateEnd.IsZero() {
+		lines = append(lines, "Until "+AC.DateEnd.Format(datefmt))
+	}
+	//Valid times
+	if !AC.TimeStart.IsZero() && !AC.TimeEnd.IsZero() {
+		lines = append(lines, AC.TimeStart.Format(timefmt)+" to "+AC.TimeEnd.Format(timefmt))
+	} else if !AC.TimeStart.IsZero() {
+		lines = append(lines, "After "+AC.TimeStart.Format(timefmt))
+	} else if !AC.TimeEnd.IsZero() {
+		lines = append(lines, "Until "+AC.TimeEnd.Format(timefmt))
+	}
+	//Valid days of the week
+	if len(AC.ValidDays) > 0 && len(AC.ValidDays) < 7 {
+		lines = append(lines, combineVDays(AC.ValidDays))
+	}
+	if len(lines) == 0 {
+		lines = append(lines, "Always Valid")
+	}
+	return strings.Join(lines, "\n")
 }
 
 func (AC *AccountCode) IsValid() bool {
@@ -126,7 +195,7 @@ func (D *Database) parseAccountCodeRows(rows *sql.Rows) ([]AccountCode, error) {
 }
 
 func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
-	q := `insert into account (
+	q := `insert into account_code (
 		account_id,
 		code,
 		label,
@@ -169,7 +238,7 @@ func (D *Database) AccountCodeUpdate(acc *AccountCode) (*AccountCode, error) {
 		return nil, fmt.Errorf("Missing Account ID for AccountCodeUpdate")
 	}
 	acc.TimeModified = time.Now()
-	q := `update account set
+	q := `update account_code set
 		account_id = ?,
 		code = ?,
 		label = ?,
@@ -204,9 +273,23 @@ func (D *Database) AccountCodeUpdate(acc *AccountCode) (*AccountCode, error) {
 	return acc, err
 }
 
-func (D *Database) AccountCodeSelectAll() ([]AccountCode, error) {
-	q := accountCodeSelect + ";"
-	rows, err := D.QuerySql(q)
+func (D *Database) AccountCodeSelectAll(accountid int32, accCodeID int64) ([]AccountCode, error) {
+	//accountid = 0 means return everything
+	q := accountCodeSelect
+	var conditions []string
+	var args []interface{}
+	if accountid > 0 {
+		conditions = append(conditions, "account_id = ?")
+		args = append(args, accountid)
+	}
+	if accCodeID > 0 {
+		conditions = append(conditions, "account_code_id = ?")
+		args = append(args, accCodeID)
+	}
+	if len(conditions) > 0 {
+		q += " where " + strings.Join(conditions, " and ")
+	}
+	rows, err := D.QuerySql(q+";", args...)
 	if err != nil {
 		return nil, err
 	}

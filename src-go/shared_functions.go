@@ -5,6 +5,14 @@ import (
 )
 
 const timeformat = "15.04" //This allows us to do string comparisons for times
+var timelocation *time.Location
+
+func inittimelocation() {
+	if timelocation == nil {
+		 timelocation, _ = time.LoadLocation("America/New_York")
+	}
+}
+
 func nowBetweenTimes(start time.Time, end time.Time) bool {
 	if !start.IsZero() && !end.IsZero() {
 		nowtime := time.Now().UTC().Format(timeformat)
@@ -25,7 +33,7 @@ func nowBetweenTimes(start time.Time, end time.Time) bool {
 }
 
 func nowValidWeekday(valid []string) bool {
-	if len(valid) < 1 {
+	if len(valid) < 1 || len(valid) > 6 {
 		return true //no restrictions
 	}
 	nowday := ""
@@ -47,4 +55,22 @@ func nowValidWeekday(valid []string) bool {
 		}
 	}
 	return isvalid
+}
+
+func parseFormDate(d string) *time.Time {
+	inittimelocation()
+	dt, err := time.ParseInLocation("2006-01-02", d, timelocation)
+	if err != nil {
+		return nil
+	}
+	return &dt
+}
+
+func parseFormTime(t string) *time.Time {
+	inittimelocation()
+	dt, err := time.ParseInLocation("2006-01-02 15:04", time.Now().Format("2006-01-02")+" "+t, timelocation)
+	if err != nil {
+		return nil
+	}
+	return &dt
 }

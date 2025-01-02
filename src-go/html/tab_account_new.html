@@ -2,6 +2,7 @@
 <button hx-post="/page-accounts" hx-target="#accounttab" hx-swap="outerHTML">Back to Accounts</button>
 <form class="grid-form">
 	<h2 style="grid-column: 1 / span 2;">New Account Information</h2>
+
 	<label for="fname">First Name:</label>
 	<input type="text" id="fname" name="fname" required>
 	<label for="lname">Last Name:</label>
@@ -9,11 +10,13 @@
 	<label for="isadmin">Is Administrator?</label>
 	<input type="checkbox" id="isadmin" name = "isadmin">
 	<hr style="grid-column: 1 / span 2;">
-	<label for="newpw">New Password:</label>
+	<label for="uname">Login User Name:</label>
+	<input type="text" id="uname" name = "uname" required>
+	<label for="newpw">Password:</label>
 	<input id="newpw" name="newpw" type="password">
-	<label for="newpw2">New Password (repeat):</label>
+	<label for="newpw2">Password (repeat):</label>
 	<input id="newpw2" name="newpw2" type="password">
-	<button hx-post="/account-create" hx-target="#accounttab" hx-swap="outerHTML" hx-include="#fname, #lname, #oldpw, #newpw, #newpw2, #isadmin" style="grid-column: 1 / span 2;">Create Account</button>
+	<button hx-post="/account-create" hx-target="#accounttab" hx-swap="outerHTML" hx-include="#fname, #lname, #newpw, #newpw2, #isadmin" style="grid-column: 1 / span 2;">Create Account</button>
 </form>
 
 </div>

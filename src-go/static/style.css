@@ -78,7 +78,7 @@ form input {
   width: 100%;
   border: 0;
   margin: 0 0 15px;
-  padding: 15px;
+  padding: 5px;
   box-sizing: border-box;
   font-size: 14px;
 }
@@ -190,7 +190,8 @@ table {
 
 table td, table th {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 4px;
+  white-space: pre-line;
 }
 
 table tr:nth-child(even){background-color: #f2f2f2;}
@@ -201,6 +202,11 @@ table th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: center;
-  background-color: #04AA6D;
+  background-color: #999;
   color: white;
+}
+
+hr {
+  border-top: 1px solid darkgrey;
+  width: 100%;
 }

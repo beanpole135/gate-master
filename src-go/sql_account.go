@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +21,20 @@ func hashPassword(pw string) string {
 		panic(err)
 	}
 	return string(hash)
+}
+
+func validatePasswordFormat(pw string) (bool, string){
+	var reasons []string
+	if len(pw) < 3 {
+		reasons = append(reasons, "3+ character minimum")
+	}
+	if strings.Contains(pw, " ") {
+		reasons = append(reasons, "no spaces")
+	}
+	if len(reasons) > 0 {
+		return false, strings.Join(reasons,", ")
+	}
+	return true, ""
 }
 
 type Account struct {
@@ -78,6 +93,9 @@ time_modified integer not null
 var accountSelect = `select account_id, first_name, last_name, username, account_status, time_created, time_modified
 	from account`
 
+var fullaccountSelect = `select account_id, first_name, last_name, username, account_status, time_created, time_modified, pw_hash
+	from account`
+
 func (D *Database) parseAccountRows(rows *sql.Rows) ([]Account, error) {
 	defer rows.Close()
 	var accounts []Account
@@ -85,6 +103,22 @@ func (D *Database) parseAccountRows(rows *sql.Rows) ([]Account, error) {
 	for rows.Next() {
 		var acc Account
 		if err := rows.Scan(&acc.AccountID, &acc.FirstName, &acc.LastName, &acc.Username, &acc.AccountStatus, &t_created, &t_mod); err != nil {
+			return accounts, err
+		}
+		acc.TimeCreated = D.ParseTime(t_created)
+		acc.TimeModified = D.ParseTime(t_mod)
+		accounts = append(accounts, acc)
+	}
+	return accounts, nil
+}
+
+func (D *Database) parseFullAccountRows(rows *sql.Rows) ([]Account, error) {
+	defer rows.Close()
+	var accounts []Account
+	var t_created, t_mod int64
+	for rows.Next() {
+		var acc Account
+		if err := rows.Scan(&acc.AccountID, &acc.FirstName, &acc.LastName, &acc.Username, &acc.AccountStatus, &t_created, &t_mod, &acc.PwHash); err != nil {
 			return accounts, err
 		}
 		acc.TimeCreated = D.ParseTime(t_created)
@@ -102,7 +136,7 @@ func (D *Database) AccountInsert(acc *Account) (*Account, error) {
 	q := `insert into account (first_name, last_name, username, pw_hash, account_status, time_created, time_modified) values
 		(?, ?, ?, ?, ?, ?, ?)
 		returning account_id;`
-	rslt, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.PwHash, acc.AccountStatus, D.TimeNow(), D.TimeNow())
+	rslt, err := D.ExecSql(q, acc.FirstName, acc.LastName, strings.ToLower(acc.Username), acc.PwHash, acc.AccountStatus, D.TimeNow(), D.TimeNow())
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +159,7 @@ func (D *Database) AccountUpdate(acc *Account) (*Account, error) {
 		account_status = ?,
 		time_modified = ?
 		where account_id = ?;`
-		_, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.PwHash, acc.AccountStatus, D.TimeNow(), acc.AccountID)
+		_, err := D.ExecSql(q, acc.FirstName, acc.LastName, strings.ToLower(acc.Username), acc.PwHash, acc.AccountStatus, D.TimeNow(), acc.AccountID)
 		if err != nil {
 			return nil, err
 		}
@@ -170,21 +204,36 @@ func (D *Database) AccountFromID(accountId int32) (*Account, error) {
 	return nil, err
 }
 
-func (D *Database) AccountForUsernamePassword(u string, phash string) (*Account, error) {
+func (D *Database) AccountExists(username string) bool {
+	q := "select account_id from account where username = ?;"
+	rows, err := D.QuerySql(q, username)
+	if err != nil {
+		return false
+	}
+	defer rows.Close()
+	return rows.Next()
+}
+
+func (D *Database) AccountForUsernamePassword(u string, passw string) (*Account, error) {
 	if blankdatabase && u == "admin" {
 		return DefaultAdminAccount(), nil
 	}
-	q := accountSelect + " where username = ? and pw_hash = ?;"
-	rows, err := D.QuerySql(q, u, phash)
+	q := fullaccountSelect + " where username = ?;"
+	rows, err := D.QuerySql(q, u)
 	if err != nil {
 		return nil, err
 	}
-	accounts, err2 := D.parseAccountRows(rows)
+	accounts, err2 := D.parseFullAccountRows(rows)
 	if err2 != nil {
 		return nil, err2
 	}
 	if len(accounts) != 1 {
 		return nil, fmt.Errorf("Invalid Username/Password: %v", accounts)
+	}
+	//Now validate the password hash
+	err = bcrypt.CompareHashAndPassword([]byte(accounts[0].PwHash), []byte(passw))
+	if err != nil {
+		return nil, err
 	}
 	//Got a valid account - return it
 	return &accounts[0], nil

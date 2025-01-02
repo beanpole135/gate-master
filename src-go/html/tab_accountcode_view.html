@@ -1,0 +1,48 @@
+<div id="accountcodetab">
+<button hx-post="/page-accountcodes" hx-target="#accountcodetab" hx-swap="outerHTML">Back to PIN codes</button>
+<form class="grid-form">
+	<h2 style="grid-column: 1 / span 2;">Gate PIN Code</h2>
+
+	<label for="code">PIN (numbers only):</label>
+	<input type="text" id="code" name="code" value="{{.AccountCode.Code}}" required>
+	<label for="label">Description:</label>
+	<input type="text" id="label" name = "label" value="{{.AccountCode.Label}}" required>
+	<hr style="grid-column: 1 / span 2;">
+	<h2 style="grid-column: 1 / span 2;">Notification Tags</h2>
+	<label for="isutility">Is Utility Company?</label>
+	<input type="checkbox" id="isutility" name = "isutility" {{if .AccountCode.IsUtility}}checked{{end}}>
+	<label for="isdelivery">Is Delivery Company?</label>
+	<input type="checkbox" id="isdelivery" name = "isdelivery"{{if .AccountCode.IsDelivery}}checked{{end}}>
+
+	<hr style="grid-column: 1 / span 2;">
+	<h2 style="grid-column: 1 / span 2;">Date/Time Restrictions (optional)</h2>
+	<label for="dstart">Start Date:</label>
+	<input type="date" id="dstart" name = "dstart">
+	<label for="dend">End Date:</label>
+	<input type="date" id="dend" name = "dend">
+	<label for="tstart">Start Time:</label>
+	<input type="time" id="tstart" name = "tstart">
+	<label for="tend">End Time:</label>
+	<input type="time" id="tend" name = "tend">
+
+	<h2 style="grid-column: 1 / span 2;">Valid Days of Week</h2>
+	<p style="grid-column: 1 / span 2;">Uncheck days to prevent usage on that day</p>
+	<label for="d_sunday">Sunday</label>
+	<input type="checkbox" id="d_sunday" name = "d_sunday" {{if .AccountCode.HasDay "su"}}checked{{end}}>
+	<label for="d_monday">Monday</label>
+	<input type="checkbox" id="d_monday" name = "d_monday" {{if .AccountCode.HasDay "mo"}}checked{{end}}>
+	<label for="d_tuesday">Tuesday</label>
+	<input type="checkbox" id="d_tuesday" name = "d_tuesday" {{if .AccountCode.HasDay "tu"}}checked{{end}}>
+	<label for="d_wednesday">Wednesday</label>
+	<input type="checkbox" id="d_wednesday" name = "d_wednesday" {{if .AccountCode.HasDay "we"}}checked{{end}}>
+	<label for="d_thursday">Thursday</label>
+	<input type="checkbox" id="d_thursday" name = "d_thursday" {{if .AccountCode.HasDay "th"}}checked{{end}}>
+	<label for="d_friday">Friday</label>
+	<input type="checkbox" id="d_friday" name = "d_friday" {{if .AccountCode.HasDay "fr"}}checked{{end}}>
+	<label for="d_saturday">Saturday</label>
+	<input type="checkbox" id="d_saturday" name = "d_saturday" {{if .AccountCode.HasDay "sa"}}checked{{end}}>
+
+	<button hx-post="/accountcode-update" hx-target="#accountcodetab" hx-swap="outerHTML" hx-include="closest form" style="grid-column: 1 / span 2;">Create Gate Code</button>
+</form>
+
+</div>

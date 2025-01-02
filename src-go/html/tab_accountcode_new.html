@@ -1,0 +1,48 @@
+<div id="accountcodetab">
+<button hx-post="/page-accountcodes" hx-target="#accountcodetab" hx-swap="outerHTML">Back to PIN codes</button>
+<form class="grid-form">
+	<h2 style="grid-column: 1 / span 2;">New Gate Code</h2>
+
+	<label for="code">PIN (numbers only):</label>
+	<input type="text" id="code" name="code" required>
+	<label for="label">Description:</label>
+	<input type="text" id="label" name = "label" required>
+	<hr style="grid-column: 1 / span 2;">
+	<h2 style="grid-column: 1 / span 2;">Notification Tags</h2>
+	<label for="isutility">Is Utility Company?</label>
+	<input type="checkbox" id="isutility" name = "isutility">
+	<label for="isdelivery">Is Delivery Company?</label>
+	<input type="checkbox" id="isdelivery" name = "isdelivery">
+
+	<hr style="grid-column: 1 / span 2;">
+	<h2 style="grid-column: 1 / span 2;">Date/Time Restrictions (optional)</h2>
+	<label for="dstart">Start Date:</label>
+	<input type="date" id="dstart" name = "dstart">
+	<label for="dend">End Date:</label>
+	<input type="date" id="dend" name = "dend">
+	<label for="tstart">Start Time:</label>
+	<input type="time" id="tstart" name = "tstart">
+	<label for="tend">End Time:</label>
+	<input type="time" id="tend" name = "tend">
+
+	<h2 style="grid-column: 1 / span 2;">Valid Days of Week</h2>
+	<p style="grid-column: 1 / span 2;">Uncheck days to prevent usage on that day</p>
+	<label for="d_sunday">Sunday</label>
+	<input type="checkbox" id="d_sunday" name = "d_sunday" checked>
+	<label for="d_monday">Monday</label>
+	<input type="checkbox" id="d_monday" name = "d_monday" checked>
+	<label for="d_tuesday">Tuesday</label>
+	<input type="checkbox" id="d_tuesday" name = "d_tuesday" checked>
+	<label for="d_wednesday">Wednesday</label>
+	<input type="checkbox" id="d_wednesday" name = "d_wednesday" checked>
+	<label for="d_thursday">Thursday</label>
+	<input type="checkbox" id="d_thursday" name = "d_thursday" checked>
+	<label for="d_friday">Friday</label>
+	<input type="checkbox" id="d_friday" name = "d_friday" checked>
+	<label for="d_saturday">Saturday</label>
+	<input type="checkbox" id="d_saturday" name = "d_saturday" checked>
+
+	<button hx-post="/accountcode-create" hx-target="#accountcodetab" hx-swap="outerHTML" hx-include="closest form" style="grid-column: 1 / span 2;">Create Gate Code</button>
+</form>
+
+</div>

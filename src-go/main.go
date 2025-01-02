@@ -26,6 +26,8 @@ type Page struct {
 	Token *AuthToken
 	Profile *Account
 	Accounts []Account
+	AccountCodes []AccountCode
+	AccountCode AccountCode
 }
 
 var templates *template.Template
@@ -56,32 +58,6 @@ func main() {
 
 	//Setup the HTTP auth system
 	setupSecureCookies()
-
-	//Sample to test the database system
-	/*A := Account{
-		FirstName: "FTest",
-		LastName: "LTest",
-		Username: "TESTUSER",
-		PwHash: "password",
-	}
-	acc, err := DB.AccountInsert(&A)
-	exitErr(err, "Cannot insert DB record: %v")
-
-	a, err := DB.AccountsSelectAll()
-	exitErr(err, "Could not load accounts: %v")
-	if len(a) < 1 {
-		fmt.Println("Account not loaded")
-		os.Exit(1)
-	}
-	fmt.Println(fmt.Sprintf("Got Accounts: %v", a))
-	a[0].FirstName = "FName2"
-	acc, err = DB.AccountUpdate(&a[0])
-	exitErr(err, "Could not update account: %v")
-
-	acc, err = DB.AccountForUsernamePassword("TESTUSER","password")
-	exitErr(err, "Could not find username with password: %v")
-	fmt.Println(fmt.Sprintf("Got account %v", acc))
-	*/
 
 	//Setup the pages / endpoints
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))

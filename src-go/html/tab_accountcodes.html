@@ -1,0 +1,27 @@
+<div id="page_accountcode">
+	<h1>Gate Access PIN Codes</h1>
+	
+	<button hx-post="/page-accountcode-new" hx-target="#page_accountcode" hx-swap="outerHTML">Create PIN</button>
+	<table>
+		<tr>
+			<th>PIN Code</th>
+			<th>Description</th>
+			<th>Status</th>
+			<th>Tags</th>
+			<th>When Valid</th>
+			<th>Created</th>
+			<th>Last Modified</th>
+		</tr>
+		{{range .AccountCodes}}
+		<tr hx-post="/page-accountcode-view" hx-vals='{"accid":"{{.AccountCodeID}}"}' hx-target="#page_accountcode" hx-swap="outerHTML">
+			<td>{{.Code}}</td>
+			<td>{{.Label}}</td>
+			<td>{{.Status}}</td>
+			<td>{{.TagsString}}</td>
+			<td>{{.WhenValidString}}</td>
+			<td>{{.TimeCreated.Format "Jan 02, 2006 15:04:05 MST"}}</td>
+			<td>{{.TimeModified.Format "Jan 02, 2006 15:04:05 MST"}}</td>
+		</tr>
+		{{end}}
+	</table>
+</div>
