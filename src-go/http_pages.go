@@ -24,11 +24,13 @@ func setupPages() {
 	http.HandleFunc("/page-account-new", checkToken(tab_accountNewHandler, true, true))
 	http.HandleFunc("/page-account-view", checkToken(tab_accountViewHandler, true, true))
 	http.HandleFunc("/account-create", checkToken(performAccountCreate, true, true))
+	http.HandleFunc("/account-update", checkToken(performAccountUpdate, true, true))
 	// AccountCodes Tab
 	http.HandleFunc("/page-accountcodes", checkToken(tab_accountcodesHandler, true, false))
 	http.HandleFunc("/page-accountcode-new", checkToken(tab_accountcodeNewHandler, true, false))
 	http.HandleFunc("/page-accountcode-view", checkToken(tab_accountcodeViewHandler, true, false))
 	http.HandleFunc("/accountcode-create", checkToken(performAccountcodeCreate, true, false))
+	http.HandleFunc("/accountcode-update", checkToken(performAccountcodeUpdate, true, false))
 	// Profile Tab
 	http.HandleFunc("/page-profile", checkToken(tab_profileHandler, true, false))
 	http.HandleFunc("/profile-update", checkToken(performProfileUpdate,true, false))
@@ -286,79 +288,96 @@ func performAccountCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 	tab_accountsHandler(w, r, p)
 }
 
-func performAccountcodeCreate(w http.ResponseWriter, r *http.Request, p *Page) {
+func performAccountUpdate(w http.ResponseWriter, r *http.Request, p *Page) {
 	// Parse the form
 	r.ParseForm()
-	code := r.Form.Get("code")
-	label := r.Form.Get("label")
-	is_utility := r.Form.Get("isutility") == formChecked
-	is_delivery := r.Form.Get("isdelivery") == formChecked
-	date_start := parseFormDate(r.Form.Get("dstart"))
-	date_end := parseFormDate(r.Form.Get("dend"))
-	time_start := parseFormTime(r.Form.Get("tstart"))
-	time_end := parseFormTime(r.Form.Get("tend"))
-	day_Su := r.Form.Get("d_sunday") == formChecked
-	day_Mo := r.Form.Get("d_monday") == formChecked
-	day_Tu := r.Form.Get("d_tuesday") == formChecked
-	day_We := r.Form.Get("d_wednesday") == formChecked
-	day_Th := r.Form.Get("d_thursday") == formChecked
-	day_Fr := r.Form.Get("d_friday") == formChecked
-	day_Sa := r.Form.Get("d_saturday") == formChecked
-
+	accid := r.Form.Get("accid")
+	fname := r.Form.Get("fname")
+	lname := r.Form.Get("lname")
+	status := r.Form.Get("status")
 	// Validate the inputs
-	if code == "" {
-		returnError(w, "Missing PIN Code")
+	if fname == "" || lname == "" {
+		returnError(w, "Missing first/last name(s)")
 		return
 	}
-	if !validatePinCodeFormat(code) {
-		returnError(w, "PIN code must be 4 or more numbers")
-		return		
-	}
-	if label == "" {
-		returnError(w, "Missing Description")
+	accnum, err := strconv.Atoi(accid)
+	if accid == "" || err != nil {
+		returnError(w, "Invalid Account")
 		return
 	}
+	//Fetch the account from the DB
+	acc, err := DB.AccountFromID(int32(accnum))
+	if err != nil {
+		returnError(w, "Invalid Account")
+		return
+	}
+	// Update the account fields
+	switch status {
+	case "active":
+		acc.AccountStatus = Account_Active
+	case "inactive":
+		acc.AccountStatus = Account_Inactive
+	case "admin":
+		acc.AccountStatus = Account_Admin
+	default:
+		returnError(w, "Invalid account status")
+		return
+	}
+	acc.FirstName = fname
+	acc.LastName = lname
 
-	if ac, _ := DB.AccountCodeMatch(code) ; ac != nil {
+	_, err = DB.AccountUpdate(acc)
+	if err != nil {
+		//Error
+		returnError(w, "Internal error updating account")
+		return
+	}
+	//Now reload the accounts page
+	tab_accountsHandler(w, r, p)
+}
+
+func performAccountcodeCreate(w http.ResponseWriter, r *http.Request, p *Page) {
+	// Load the form input into the AccountCode
+	acc, err := LoadAccountCodeFromForm(r)
+	if err != nil {
+		returnError(w, err.Error())
+		return
+	}
+	acc.AccountID = int64(p.Token.UserId) //Always associate new PIN with current user account
+	acc.IsActive = true //new PINs are always active initially
+
+	// New Code Validation
+	if ac, _ := DB.AccountCodeMatch(acc.Code) ; ac != nil {
 		returnError(w, "Invalid PIN - pick another one")
 		return
 	}
 
-	if (time_start != nil && time_end == nil) || (time_start == nil && time_end != nil) {
-		returnError(w, "Both start and end times must be provided, or neither of them")
-	}
-	// Create the new accountcode
-	acc := AccountCode{
-		IsActive: true,
-		AccountID: int64(p.Token.UserId),
-		Code: code,
-		Label: label,
-		IsUtility: is_utility,
-		IsDelivery: is_delivery,
-	}
-	if day_Su { acc.ValidDays = append(acc.ValidDays, "su") }
-	if day_Mo { acc.ValidDays = append(acc.ValidDays, "mo") }
-	if day_Tu { acc.ValidDays = append(acc.ValidDays, "tu") }
-	if day_We { acc.ValidDays = append(acc.ValidDays, "we") }
-	if day_Th { acc.ValidDays = append(acc.ValidDays, "th") }
-	if day_Fr { acc.ValidDays = append(acc.ValidDays, "fr") }
-	if day_Sa { acc.ValidDays = append(acc.ValidDays, "sa") }
-	if date_start != nil {
-		acc.DateStart = *date_start
-	}
-	if date_end != nil {
-		acc.DateEnd = *date_end
-	}
-	if time_start != nil {
-		acc.TimeStart = *time_start
-	}
-	if time_end != nil {
-		acc.TimeEnd = *time_end
-	}
-	_, err := DB.AccountCodeInsert(&acc)
+	// Create the new code
+	_, err = DB.AccountCodeInsert(&acc)
 	if err != nil {
 		//Error
 		returnError(w, "Internal error creating account")
+		return
+	}
+	//Now reload the accountcodes page
+	tab_accountcodesHandler(w, r, p)
+}
+
+func performAccountcodeUpdate(w http.ResponseWriter, r *http.Request, p *Page) {
+
+	// Load the form input into the AccountCode
+	acc, err := LoadAccountCodeFromForm(r)
+	if err != nil {
+		returnError(w, err.Error())
+		return
+	}
+	acc.AccountID = int64(p.Token.UserId)
+
+	// Create the new code
+	_, err = DB.AccountCodeUpdate(&acc)
+	if err != nil {
+		//Error
+		returnError(w, "Internal error updating PIN")
 		return
 	}
 	//Now reload the accountcodes page

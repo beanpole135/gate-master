@@ -62,7 +62,7 @@ func main() {
 	//Setup the pages / endpoints
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
 	http.HandleFunc("/stream", checkToken(Cam.ServeImages, true, false))
-	http.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.png", http.StatusSeeOther))
+	http.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.ico", http.StatusSeeOther))
 	// Individual Pages
 	setupPages()
 	// Final setup

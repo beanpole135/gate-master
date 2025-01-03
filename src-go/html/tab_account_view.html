@@ -7,9 +7,14 @@
 	<label for="lname">Last Name:</label>
 	<input type="text" id="lname" name = "lname" value="{{.Profile.LastName}}" required>
 	<label for="uname">Login Username:</label>
-	<input type="text" id="uname" name="uname" value="{{.Profile.Username}}" required>
-	<label for="isadmin">Is Administrator?</label>
-	<input type="checkbox" id="isadmin" name = "isadmin">
+	<input type="text" id="uname" name="uname" value="{{.Profile.Username}}" disabled>
+	<label for="status">Account Status</label>
+	<select id="status" name="status" value="{{.Profile.StatusValue}}" required>
+		<option value="active">Active</option>
+		<option value="inactive">Inactive/Disabled</option>
+		<option value="admin">Administrator</option>
+	</select>
+	<button hx-post="/account-update" hx-target="#accounttab" hx-swap="outerHTML" hx-include="closest form" hx-vals='{"accid": "{{.Profile.AccountID}}"}' style="grid-column: 1 / span 2;">Update Account</button>
 </form>
 
 </div>

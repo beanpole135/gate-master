@@ -4,9 +4,11 @@
 	<h2 style="grid-column: 1 / span 2;">Gate PIN Code</h2>
 
 	<label for="code">PIN (numbers only):</label>
-	<input type="text" id="code" name="code" value="{{.AccountCode.Code}}" required>
+	<input type="text" id="code" name="code" value="{{.AccountCode.Code}}" disabled>
 	<label for="label">Description:</label>
 	<input type="text" id="label" name = "label" value="{{.AccountCode.Label}}" required>
+	<label for="isactive">Is Active?</label>
+	<input type="checkbox" id="isactive" name = "isactive" {{if .AccountCode.IsActive}}checked{{end}}>
 	<hr style="grid-column: 1 / span 2;">
 	<h2 style="grid-column: 1 / span 2;">Notification Tags</h2>
 	<label for="isutility">Is Utility Company?</label>
@@ -17,13 +19,13 @@
 	<hr style="grid-column: 1 / span 2;">
 	<h2 style="grid-column: 1 / span 2;">Date/Time Restrictions (optional)</h2>
 	<label for="dstart">Start Date:</label>
-	<input type="date" id="dstart" name = "dstart">
+	<input type="date" id="dstart" name = "dstart" value="{{.AccountCode.DateStart.Format "2006-01-02"}}">
 	<label for="dend">End Date:</label>
-	<input type="date" id="dend" name = "dend">
+	<input type="date" id="dend" name = "dend" value="{{.AccountCode.DateEnd.Format "2006-01-02"}}">
 	<label for="tstart">Start Time:</label>
-	<input type="time" id="tstart" name = "tstart">
+	<input type="time" id="tstart" name = "tstart" {{if not .AccountCode.TimeStart.IsZero}}value="{{.AccountCode.TimeStart.Format "15:04"}}"{{end}}>
 	<label for="tend">End Time:</label>
-	<input type="time" id="tend" name = "tend">
+	<input type="time" id="tend" name = "tend" {{if not .AccountCode.TimeEnd.IsZero}}value="{{.AccountCode.TimeEnd.Format "15:04"}}"{{end}}>
 
 	<h2 style="grid-column: 1 / span 2;">Valid Days of Week</h2>
 	<p style="grid-column: 1 / span 2;">Uncheck days to prevent usage on that day</p>
@@ -42,7 +44,7 @@
 	<label for="d_saturday">Saturday</label>
 	<input type="checkbox" id="d_saturday" name = "d_saturday" {{if .AccountCode.HasDay "sa"}}checked{{end}}>
 
-	<button hx-post="/accountcode-update" hx-target="#accountcodetab" hx-swap="outerHTML" hx-include="closest form" style="grid-column: 1 / span 2;">Create Gate Code</button>
+	<button hx-post="/accountcode-update" hx-target="#accountcodetab" hx-swap="outerHTML" hx-include="closest form" hx-vals='{"acodeid": "{{.AccountCode.AccountCodeID}}"}' style="grid-column: 1 / span 2;">Update Gate Code</button>
 </form>
 
 </div>

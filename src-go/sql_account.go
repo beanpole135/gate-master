@@ -61,6 +61,10 @@ func (A Account) Status() string {
 	}
 }
 
+func (A Account) StatusValue() string {
+	return strings.ToLower(A.Status())
+}
+
 func DefaultAdminAccount() *Account {
 return &Account{
 			AccountID: -1,
