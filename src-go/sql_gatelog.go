@@ -1,0 +1,93 @@
+package main
+
+import (
+	"database/sql"
+	"time"
+)
+
+type GateLog struct {
+	LogID int64
+	AccountID int32
+	AccountName string
+	UsedCode string
+	UsedWeb bool
+	CodeTags string
+	GatePicture []byte
+	TimeOpened time.Time
+}
+
+
+func (D *Database) CreateGateLogTable() error {
+	q := `create table if not exists gatelog (
+log_id integer primary key autoincrement,
+account_id integer not null,
+account_name text not null,
+used_code text,
+used_web boolean,
+code_tags text,
+gate_picture_bytes blob,
+time_opened integer not null
+	);`
+	_, err := D.ExecSql(q)
+	return err
+}
+
+// internal function to read the rows from the table
+func (D *Database) parseGatelogRows(rows *sql.Rows, with_picture bool) ([]GateLog, error) {
+	defer rows.Close()
+	var list []GateLog
+	var t_opened int64
+	for rows.Next() {
+		var gl GateLog
+		var err error
+		if with_picture {
+			if err = rows.Scan(&gl.LogID, &gl.AccountID, &gl.AccountName, &gl.UsedCode, &gl.UsedWeb, &gl.CodeTags, &gl.GatePicture, &t_opened); err != nil {
+				return list, err
+			}
+		} else {
+			if err = rows.Scan(&gl.LogID, &gl.AccountID, &gl.AccountName, &gl.UsedCode, &gl.UsedWeb, &gl.CodeTags, &t_opened); err != nil {
+				return list, err
+			}
+		}
+		gl.TimeOpened = D.ParseTime(t_opened)
+		list = append(list, gl)
+	}
+	return list, nil
+}
+
+func (D *Database) GateLogInsert(gl *GateLog) (*GateLog, error) {
+	q := `insert into gatelog (account_id, account_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened) values
+		(?, ?, ?, ?, ?, ?, ?)
+		returning log_id;`
+	rslt, err := D.ExecSql(q, gl.AccountID, gl.AccountName, gl.UsedCode, gl.UsedWeb, gl.CodeTags, gl.GatePicture, D.TimeNow())
+	if err != nil {
+		return nil, err
+	}
+	recordId, err := rslt.LastInsertId()
+	gl.LogID = int64(recordId)
+	return gl, err
+}
+
+func (D *Database) GatelogSelectAll() ([]GateLog, error) {
+	q := `select log_id, account_id, account_name, used_code, used_web, code_tags, time_opened
+	from gatelog order by time_opened desc limit 1000;`
+	rows, err := D.QuerySql(q)
+	if err != nil {
+		return nil, err
+	}
+	return D.parseGatelogRows(rows, false)
+}
+
+func (D *Database) GateLogFromID(logId int32) (*GateLog, error) {
+	q := `select log_id, account_id, account_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened
+	from gatelog where log_id = ?;`
+	rows, err := D.QuerySql(q, logId)
+	if err != nil {
+		return nil, err
+	}
+	list, err := D.parseGatelogRows(rows, true)
+	if len(list) >= 1 {
+		return &list[0], err
+	}
+	return nil, err
+}
