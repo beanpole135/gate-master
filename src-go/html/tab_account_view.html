@@ -10,9 +10,9 @@
 	<input type="text" id="uname" name="uname" value="{{.Profile.Username}}" disabled>
 	<label for="status">Account Status</label>
 	<select id="status" name="status" value="{{.Profile.StatusValue}}" required>
-		<option value="active">Active</option>
-		<option value="inactive">Inactive/Disabled</option>
-		<option value="admin">Administrator</option>
+		<option value="active" {{if eq .Profile.StatusValue "active"}}selected{{end}}>Active</option>
+		<option value="inactive" {{if eq .Profile.StatusValue "inactive"}}selected{{end}}>Inactive/Disabled</option>
+		<option value="admin" {{if eq .Profile.StatusValue "admin"}}selected{{end}}>Administrator</option>
 	</select>
 	<button hx-post="/account-update" hx-target="#accounttab" hx-swap="outerHTML" hx-include="closest form" hx-vals='{"accid": "{{.Profile.AccountID}}"}' style="grid-column: 1 / span 2;">Update Account</button>
 </form>

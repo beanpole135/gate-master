@@ -35,6 +35,10 @@ func setupPages() {
 	http.HandleFunc("/page-profile", checkToken(tab_profileHandler, true, false))
 	http.HandleFunc("/profile-update", checkToken(performProfileUpdate,true, false))
 	http.HandleFunc("/profile-pwreset", checkToken(performProfilePWReset,true, false))
+	// View Tab
+	http.HandleFunc("/page-logs", checkToken(tab_logsHandler, true, false))
+	http.HandleFunc("/page-log-view", checkToken(tab_logViewHandler,true, false))
+
 }
 
 // Page Handlers
@@ -83,7 +87,7 @@ func performLogoutHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 }
 
 func gatePageHandler(w http.ResponseWriter, r *http.Request, p *Page) {
-	renderTemplate(w, "gate", p)
+	renderTemplate(w, "post-login", p)
 }
 
 func tab_gateHandler(w http.ResponseWriter, r *http.Request, p *Page) {
@@ -163,8 +167,45 @@ func tab_profileHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 	renderTemplate(w, "tab_profile", p)
 }
 
+func tab_logsHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	p.GateLogs, _ = DB.GatelogSelectAll()
+	renderTemplate(w, "tab_logs", p)
+}
+
+func tab_logViewHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	//Parse the form
+	r.ParseForm()
+	logid := r.Form.Get("logid")
+	id, err := strconv.Atoi(logid)
+	if err != nil {
+		//Invalid log ID
+		returnError(w, "Invalid log Code")
+		return		
+	}
+	// Load the log from the DB
+	p.GateLog, err = DB.GateLogFromID(int64(id))
+	if err != nil || p.GateLog == nil {
+		//Invalid account ID
+		returnError(w, "Invalid Log ID")
+		return
+	}
+	renderTemplate(w, "tab_log_view", p)
+}
+
 func performGateOpen(w http.ResponseWriter, r *http.Request, p *Page) {
 	fmt.Println("Gate Opening!")
+	acc, err := DB.AccountFromID(p.Token.UserId)
+	if err != nil {
+		// Current user no longer exists?
+		handleError(w, r)
+		return		
+	}
+	gl := GateLog{
+		AccountID: p.Token.UserId,
+		OpenedName: fmt.Sprintf("%s, %s", acc.LastName, acc.FirstName),
+		UsedWeb: true,
+	}
+	DB.GateLogInsert(&gl)
 	renderTemplate(w, "button_gate_opening", p)
 }
 

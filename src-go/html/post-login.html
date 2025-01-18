@@ -1,6 +1,7 @@
   <div class="gate-page">
     <div class="topbar">
       <button class="tabbutton" hx-post="/page-view" hx-trigger="click,load" hx-target="#pagediv" hx-swap="innerHTML">Gate</button>
+      <button class="tabbutton" hx-post="/page-logs" hx-target="#pagediv" hx-swap="innerHTML">Logs</button>
       {{if .Token.IsAdmin}}
       <button class="tabbutton" hx-post="/page-accounts" hx-target="#pagediv" hx-swap="innerHTML">Accounts</button>
       {{end}}

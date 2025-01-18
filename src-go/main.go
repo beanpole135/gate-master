@@ -28,6 +28,8 @@ type Page struct {
 	Accounts []Account
 	AccountCodes []AccountCode
 	AccountCode AccountCode
+	GateLogs []GateLog
+	GateLog *GateLog
 }
 
 var templates *template.Template
