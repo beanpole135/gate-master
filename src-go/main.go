@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 const PageTitle = "Shadow Mountain"
@@ -62,15 +64,24 @@ func main() {
 	setupSecureCookies()
 
 	//Setup the pages / endpoints
+	http.HandleFunc("/favicon.ico", favicon)
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
 	http.HandleFunc("/stream", checkToken(Cam.ServeImages, true, false))
-	http.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.ico", http.StatusSeeOther))
+	
 	// Individual Pages
 	setupPages()
 	// Final setup
 	http.HandleFunc("/", handleError)
 	fmt.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func favicon(w http.ResponseWriter, r *http.Request) {
+	data, err := staticFS.ReadFile("static/favicon.ico")
+    if err != nil { 
+    	fmt.Println("favicon.ico loading error", err)
+    }
+    http.ServeContent(w, r, "favicon.ico", time.Now(), bytes.NewReader(data))
 }
 
 // Internal functions for loading pages

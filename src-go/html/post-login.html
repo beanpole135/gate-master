@@ -1,13 +1,21 @@
   <div class="gate-page">
     <div class="topbar">
-      <button class="tabbutton" hx-post="/page-view" hx-trigger="click,load" hx-target="#pagediv" hx-swap="innerHTML">Gate</button>
-      <button class="tabbutton" hx-post="/page-logs" hx-target="#pagediv" hx-swap="innerHTML">Logs</button>
-      {{if .Token.IsAdmin}}
-      <button class="tabbutton" hx-post="/page-accounts" hx-target="#pagediv" hx-swap="innerHTML">Accounts</button>
-      {{end}}
-      <button class="tabbutton" hx-post="/auth-logout" style="float: right;">Logout</button>
-      <button class="tabbutton" hx-post="/page-profile" hx-target="#pagediv" hx-swap="innerHTML" style="float: right;">Profile</button>
-      <button class="tabbutton" hx-post="/page-accountcodes" hx-target="#pagediv" hx-swap="innerHTML" style="float: right;">PIN Codes</button>
+      <div class="tabbutton" hx-post="/page-view" hx-trigger="click,load" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-camera"></i> Gate</div>
+      <div class="tabbutton" hx-post="/page-logs" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-book"></i> Logs</div>
+
+      <div class="navmenu tabbutton" style="margin-left: auto;">
+        More <i class="fa fa-caret-down"></i>
+        <div class="menucontent">
+          <button class="tabbutton" hx-post="/page-profile" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-user"></i> My Profile</button>
+          <button class="tabbutton" hx-post="/page-accountcodes" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-key"></i> My PIN Codes</button>
+          {{if .Token.IsAdmin}}
+          <hr>
+          <button class="tabbutton" hx-post="/page-accounts" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-address-book-o"></i> Manage Accounts</button>
+          {{end}}
+          <hr>
+          <button class="tabbutton" hx-post="/auth-logout"><i class="fa fa-sign-out"></i> Logout</button>
+        </div>
+      </div>
     </div>
     <div class="main" id="pagediv">
     </div>

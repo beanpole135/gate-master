@@ -1,14 +1,15 @@
 <div id="logtab">
-<button hx-post="/page-accounts" hx-target="#logtab" hx-swap="outerHTML">Back to Accounts</button>
+<button hx-post="/page-logs" hx-target="#logtab" hx-swap="outerHTML">Back to Logs</button>
 <form class="grid-form">
-	<h2 style="grid-column: 1 / span 2;">Account Details</h2>
-	<label for="fname">First Name:</label>
-	<input type="text" id="fname" name="fname" value="{{.Profile.FirstName}}" required>
-	<label for="lname">Last Name:</label>
-	<input type="text" id="lname" name = "lname" value="{{.Profile.LastName}}" required>
-	<label for="uname">Login Username:</label>
-	<input type="text" id="uname" name="uname" value="{{.Profile.Username}}" disabled>
-	<label for="status">Account Status</label>
+	<h2 style="grid-column: 1 / span 2;">Gate Log Details</h2>
+	<label for="1">Opened By:</label>
+	<p id="1" name="1">{{.GateLog.OpenedName}}</p>
+	<label for="2">Date/Time Opened:</label>
+	<p id="2" name = "2">{{.GateLog.TimeOpened.Format "Jan 02, 2006 3:04PM MST"}}</p>
+	<label for="3">Tags:</label>
+	<p id="3" name="3">{{.GateLog.CodeTags}}</p>
+	<label for="4">Opened By:</label>
+	<p id="4" name="4">{{.GateLog.OpenedName}}</p>
 
 </form>
 

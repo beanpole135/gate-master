@@ -205,7 +205,10 @@ func performGateOpen(w http.ResponseWriter, r *http.Request, p *Page) {
 		OpenedName: fmt.Sprintf("%s, %s", acc.LastName, acc.FirstName),
 		UsedWeb: true,
 	}
-	DB.GateLogInsert(&gl)
+	_, err = DB.GateLogInsert(&gl)
+	if err != nil {
+		fmt.Println("Error inserting GateLog:", err)
+	}
 	renderTemplate(w, "button_gate_opening", p)
 }
 

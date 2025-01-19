@@ -55,6 +55,10 @@ func (D *Database) CreateTables() error {
 	if err != nil {
 		return err
 	}
+	err = D.CreateGateLogTable()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
