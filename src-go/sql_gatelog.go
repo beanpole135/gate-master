@@ -105,3 +105,9 @@ func (D *Database) GateLogFromID(logId int64) (*GateLog, error) {
 	}
 	return nil, err
 }
+
+func (D *Database) PruneGateLogs(before time.Time) error {
+	q := `DELETE from gatelog where time_opened < ?;`
+	_, err := D.ExecSql(q, D.ToTime(before))
+	return err
+}

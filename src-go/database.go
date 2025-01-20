@@ -2,11 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3" //SQLite database driver
 )
+
+const YearsRetentionPolicy = 1
 
 type Database struct {
 	filepath string
@@ -59,7 +62,34 @@ func (D *Database) CreateTables() error {
 	if err != nil {
 		return err
 	}
+	err = D.CreateContactTable()
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+func (D *Database) PruneTables() {
+	//This is designed to be started as a background goroutine from main.go ONLY
+	for range time.Tick(24*time.Hour) {
+		ya := time.Now().AddDate(-YearsRetentionPolicy,0,0) //years ago
+		err := D.PruneGateLogs(ya)
+		if err != nil {
+			fmt.Println("Got error pruning GateLogs before %v: %v", ya, err)
+		}
+		err = D.PruneContacts(ya)
+		if err != nil {
+			fmt.Println("Got error pruning Contacts before %v: %v", ya, err)
+		}
+		err = D.PruneAccountCodes(ya)
+		if err != nil {
+			fmt.Println("Got error pruning AccountCodes before %v: %v", ya, err)
+		}
+		err = D.PruneAccounts(ya)
+		if err != nil {
+			fmt.Println("Got error pruning Accounts before %v: %v", ya, err)
+		}
+	}
 }
 
 func (D *Database) ExecSql(query string, args ...any) (sql.Result, error) {

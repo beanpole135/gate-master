@@ -37,6 +37,7 @@ type Page struct {
 var templates *template.Template
 var Cam *Camera
 var DB *Database
+var CONFIG *Config
 
 func exitErr(err error, msg string) {
 	if err != nil {
@@ -47,6 +48,9 @@ func exitErr(err error, msg string) {
 
 func main() {
 	var err error
+	//Load the config file
+	CONFIG, err = LoadConfig("config.json")
+	//Load the HTML templates (built-in)
 	templates, err = template.ParseFS(htmlFS, "html/*.html")
 	exitErr(err, "Could not load Templates: %v")
 
@@ -56,7 +60,7 @@ func main() {
 	defer Cam.Close()
 
 	//Setup the Database
-	DB, err = NewDatabase("test.sqlite")
+	DB, err = NewDatabase(CONFIG.DbFile)
 	exitErr(err, "Could not create database: %v")
 	defer DB.Close()
 
@@ -71,6 +75,8 @@ func main() {
 	// Individual Pages
 	setupPages()
 	// Final setup
+	go DB.PruneTables() //Runs the pruning checks every day
+
 	http.HandleFunc("/", handleError)
 	fmt.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

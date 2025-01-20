@@ -312,3 +312,9 @@ func (D *Database) AccountCodeMatch(code string) (*AccountCode, error) {
 	//Got a valid account - return it
 	return &accounts[0], nil
 }
+
+func (D *Database) PruneAccountCodes(before time.Time) error {
+	q := `DELETE from account_code where is_active = false and time_modified < ?;`
+	_, err := D.ExecSql(q, D.ToTime(before))
+	return err
+}

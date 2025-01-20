@@ -242,3 +242,9 @@ func (D *Database) AccountForUsernamePassword(u string, passw string) (*Account,
 	//Got a valid account - return it
 	return &accounts[0], nil
 }
+
+func (D *Database) PruneAccounts(before time.Time) error {
+	q := `DELETE from account where is_active = false and time_modified < ?;`
+	_, err := D.ExecSql(q, D.ToTime(before))
+	return err
+}
