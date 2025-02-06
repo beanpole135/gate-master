@@ -1,0 +1,38 @@
+<div id="contacttab">
+<button hx-post="/page-contacts" hx-target="#contacttab" hx-swap="outerHTML">Back to Accounts</button>
+<form class="grid-form">
+	<h2 style="grid-column: 1 / span 2;">Contact Details</h2>
+	<label for="isactive">Contact Status</label>
+	<select id="isactive" name="isactive" value="{{.Contact.StatusValue}}" required>
+		<option value="active" {{if eq .Contact.StatusValue "active"}}selected{{end}}>Active</option>
+		<option value="inactive" {{if eq .Contact.StatusValue "inactive"}}selected{{end}}>Inactive/Disabled</option>
+	</select>
+	<label for="celltype">Contact Type:</label>
+	<select id="celltype" name="celltype" title="Select Email or a cell phone carrier" required>
+		<option value="email" {{if eq .Contact.ContactType "email"}}selected{{end}}>Email Only</option>
+		<option value="att" {{if eq .Contact.ContactType "att"}}selected{{end}}>AT&T</option>
+		<option value="boost" {{if eq .Contact.ContactType "boost"}}selected{{end}}>Boost Mobile</option>
+		<option value="cricket" {{if eq .Contact.ContactType "cricket"}}selected{{end}}>Cricket Wireless</option>
+		<option value="googlefi" {{if eq .Contact.ContactType "googlefi"}}selected{{end}}>Google Fi</option>
+		<option value="metropcs" {{if eq .Contact.ContactType "metropcs"}}selected{{end}}>MetroPCS</option>
+		<option value="sprint" {{if eq .Contact.ContactType "sprint"}}selected{{end}}>Sprint</option>
+		<option value="tmobile" {{if eq .Contact.ContactType "tmobile"}}selected{{end}}>T-Mobile</option>
+		<option value="uscell" {{if eq .Contact.ContactType "uscell"}}selected{{end}}>US Cellular</option>
+		<option value="verizon" {{if eq .Contact.ContactType "verizon"}}selected{{end}}>Verizon</option>
+		<option value="virgin" {{if eq .Contact.ContactType "virgin"}}selected{{end}}>Virgin Mobile</option>
+	</select>
+	<label for="email" title="Email address (if Email Only), or a phone number for text notifications">Email or Phone #:</label>
+	<input type="text" id="email" name="email" value="{{.Contact.ContactValue}}" required>
+	<hr style="grid-column: 1 / span 2;">
+	<h2 style="grid-column: 1 / span 2;">Notification Tags</h2>
+	<label for="isprimary" title="Use this contact for account-related communications (password changes, etc)?">Account Contact</label>
+	<input type="checkbox" id="isprimary" name = "isprimary" {{if eq .Contact.IsPrimary}}checked{{end}}>
+	<label for="isutility">Is Utility Company?</label>
+	<input type="checkbox" id="isutility" name = "isutility" {{if eq .Contact.IsUtility}}checked{{end}}>
+	<label for="isdelivery">Is Delivery Company?</label>
+	<input type="checkbox" id="isdelivery" name = "isdelivery" {{if eq .Contact.IsDelivery}}checked{{end}}>
+
+	<button hx-post="/contact-update" hx-target="#contacttab" hx-swap="outerHTML" hx-include="closest form" hx-vals='{"contactid": "{{.ContactID}}"}' style="grid-column: 1 / span 2;">Update Contact</button>
+</form>
+
+</div>

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -19,6 +20,42 @@ type Contact struct {
 	//Internal audit fields
 	TimeCreated time.Time
 	TimeModified time.Time
+}
+
+func (C Contact) ContactEmail() string {
+	if C.Email != "" {
+		return C.Email
+	}
+	eml, _ := phoneToEmail(C.PhoneNum, C.CellType)
+	return eml
+}
+
+func (C Contact) Display() string {
+	if C.Email != "" {
+		return C.Email
+	}
+	return fmt.Sprintf("%s (%s)", C.PhoneNum, strings.ToUpper(C.CellType))
+}
+
+func (C Contact) StatusValue() string {
+	if C.IsActive {
+		return "active"
+	}
+	return "inactive"
+}
+
+func (C Contact) ContactType() string {
+	if C.Email != "" {
+		return "email"
+	}
+	return C.CellType
+}
+
+func (C Contact) ContactValue() string {
+	if C.Email != "" {
+		return C.Email
+	}
+	return C.PhoneNum
 }
 
 func (D *Database) CreateContactTable() error {
@@ -77,7 +114,6 @@ func (D *Database) ContactUpdate(c *Contact) (*Contact, error) {
 	}
 	c.TimeModified = time.Now()
 	q := `update contact set
-		account_id = ?,
 		email = ?,
 		phone_num = ?,
 		cell_type = ?,
@@ -86,9 +122,8 @@ func (D *Database) ContactUpdate(c *Contact) (*Contact, error) {
 		is_utility = ?,
 		is_delivery = ?,
 		time_modified = ?
-		where contact_id = ?;`
+		where contact_id = ? and account_id = ?;`
 	_, err := D.ExecSql(q, 
-		c.AccountID,
 		c.Email,
 		c.PhoneNum,
 		c.CellType,
@@ -98,6 +133,7 @@ func (D *Database) ContactUpdate(c *Contact) (*Contact, error) {
 		c.IsDelivery,
 		D.TimeNow(),
 		c.ContactID,
+		c.AccountID,
 	)
 	if err != nil {
 		return nil, err
@@ -112,6 +148,15 @@ func (D *Database) ContactSelectAll() ([]Contact, error) {
 		return nil, err
 	}
 	return D.parseContactRows(rows, false)
+}
+
+func (D *Database) ContactsForAccount(accId int64) ([]Contact, error) {
+	q := contactquery + ` where account_id = ?;`
+	rows, err := D.QuerySql(q, accId)
+	if err != nil {
+		return nil, err
+	}
+	return D.parseContactRows(rows, true)
 }
 
 func (D *Database) ContactFromID(contactId int64) (*Contact, error) {

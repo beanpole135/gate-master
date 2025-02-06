@@ -1,0 +1,28 @@
+{{define "widget_contacts"}}
+<form id="page_contacts">
+	<h1>Login Accounts</h1>
+	<button hx-post="/page-contact-new" hx-target="#page_contacts" hx-swap="outerHTML">Create Contact</button>
+	<table>
+		<tr>
+			<th>Contact</th>
+			<th>Status</th>
+			<th>Is Primary?</th>
+			<th>Is Utility?</th>
+			<th>Is Delivery?</th>
+			<th>Created</th>
+			<th>Last Modified</th>
+		</tr>
+		{{range .Contacts}}
+		<tr hx-post="/page-contact-view" hx-vals='{"contactid":"{{.ContactID}}"}' hx-target="#page_contact" hx-swap="outerHTML">
+			<td>{{.Display}}</td>
+			<td>{{.StatusValue}}</td>
+			<td>{{.IsPrimary}}</td>
+			<td>{{.IsUtility}}</td>
+			<td>{{.IsDelivery}}</td>
+			<td>{{.TimeCreated.Format "Jan 02, 2006 15:04:05 MST"}}</td>
+			<td>{{.TimeModified.Format "Jan 02, 2006 15:04:05 MST"}}</td>
+		</tr>
+		{{end}}
+	</table>
+</form>
+{{end}}

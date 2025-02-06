@@ -1,0 +1,33 @@
+<div id="contacttab">
+<button hx-post="/page-contacts" hx-target="#contacttab" hx-swap="outerHTML">Back to Contacts</button>
+<form class="grid-form">
+	<h2 style="grid-column: 1 / span 2;">New Contact Information</h2>
+	<label for="celltype">Contact Type:</label>
+	<select id="celltype" name="celltype" title="Select Email or a cell phone carrier" required>
+		<option value="email" selected>Email Only</option>
+		<option value="att">AT&T</option>
+		<option value="boost">Boost Mobile</option>
+		<option value="cricket">Cricket Wireless</option>
+		<option value="googlefi">Google Fi</option>
+		<option value="metropcs">MetroPCS</option>
+		<option value="sprint">Sprint</option>
+		<option value="tmobile">T-Mobile</option>
+		<option value="uscell">US Cellular</option>
+		<option value="verizon">Verizon</option>
+		<option value="virgin">Virgin Mobile</option>
+	</select>
+	<label for="email" title="Email address (if Email Only), or a phone number for text notifications">Email or Phone #:</label>
+	<input type="text" id="email" name="email" required>
+	<hr style="grid-column: 1 / span 2;">
+	<h2 style="grid-column: 1 / span 2;">Notification Tags</h2>
+	<label for="isprimary" title="Use this contact for account-related communications (password changes, etc)?">Account Contact</label>
+	<input type="checkbox" id="isprimary" name = "isprimary">
+	<label for="isutility">Is Utility Company?</label>
+	<input type="checkbox" id="isutility" name = "isutility">
+	<label for="isdelivery">Is Delivery Company?</label>
+	<input type="checkbox" id="isdelivery" name = "isdelivery">
+
+	<button hx-post="/contact-create" hx-target="#contacttab" hx-swap="outerHTML" hx-include="closest form" style="grid-column: 1 / span 2;">Create Contact</button>
+</form>
+
+</div>

@@ -31,6 +31,12 @@ func setupPages() {
 	http.HandleFunc("/page-accountcode-view", checkToken(tab_accountcodeViewHandler, true, false))
 	http.HandleFunc("/accountcode-create", checkToken(performAccountcodeCreate, true, false))
 	http.HandleFunc("/accountcode-update", checkToken(performAccountcodeUpdate, true, false))
+	// Contacts Tab
+	http.HandleFunc("/page-contacts", checkToken(tab_contactsHandler, true, false))
+	http.HandleFunc("/page-contact-new", checkToken(tab_contactNewHandler, true, false))
+	http.HandleFunc("/contact-create", checkToken(performContactCreate, true, false))
+	http.HandleFunc("/contact-update", checkToken(performContactUpdate, true, false))
+
 	// Profile Tab
 	http.HandleFunc("/page-profile", checkToken(tab_profileHandler, true, false))
 	http.HandleFunc("/profile-update", checkToken(performProfileUpdate,true, false))
@@ -121,6 +127,8 @@ func tab_accountViewHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 		return
 	}
 	// Load additional account info here
+	p.Contacts, err = DB.ContactsForAccount(int64(id))
+	// Now render the page
 	renderTemplate(w, "tab_account_view", p)
 }
 
@@ -163,6 +171,9 @@ func tab_profileHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 		tab_accountsHandler(w, r, p)
 		return
 	}
+	// Load additional account info here
+	p.Contacts, err = DB.ContactsForAccount(int64(p.Token.UserId))
+
 	// Now render the page
 	renderTemplate(w, "tab_profile", p)
 }
@@ -190,6 +201,15 @@ func tab_logViewHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 		return
 	}
 	renderTemplate(w, "tab_log_view", p)
+}
+
+func tab_contactsHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	p.Contacts, _ = DB.ContactsForAccount(int64(p.Token.UserId)) //all contacts for current user
+	renderTemplate(w, "widget_contacts", p)
+}
+
+func tab_contactNewHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	renderTemplate(w, "widget_contact_new", p)
 }
 
 func performGateOpen(w http.ResponseWriter, r *http.Request, p *Page) {
@@ -426,4 +446,47 @@ func performAccountcodeUpdate(w http.ResponseWriter, r *http.Request, p *Page) {
 	}
 	//Now reload the accountcodes page
 	tab_accountcodesHandler(w, r, p)
+}
+
+func performContactCreate(w http.ResponseWriter, r *http.Request, p *Page) {
+	// Load the form input into the AccountCode
+	ct, err := LoadContactFromForm(r)
+	if err != nil {
+		returnError(w, err.Error())
+		return
+	}
+	ct.AccountID = p.Token.UserId //Always associate new Contact with current user account
+	ct.IsActive = true //new contacts are always active initially
+
+
+	// Create the new code
+	_, err = DB.ContactInsert(&ct)
+	if err != nil {
+		//Error
+		returnError(w, "Internal error creating contact")
+		return
+	}
+	//Now reload the accountcodes page
+	tab_contactsHandler(w, r, p)
+}
+
+func performContactUpdate(w http.ResponseWriter, r *http.Request, p *Page) {
+
+	// Load the form input into the AccountCode
+	acc, err := LoadContactFromForm(r)
+	if err != nil {
+		returnError(w, err.Error())
+		return
+	}
+	acc.AccountID = p.Token.UserId
+
+	// Create the new code
+	_, err = DB.ContactUpdate(&acc)
+	if err != nil {
+		//Error
+		returnError(w, "Internal error updating contact")
+		return
+	}
+	//Now reload the accountcodes page
+	tab_contactsHandler(w, r, p)
 }
