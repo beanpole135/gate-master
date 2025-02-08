@@ -8,30 +8,31 @@ import (
 )
 
 func validatePinCodeFormat(p string) bool {
-    for _, v := range p {
-    	//This checks each character for a numeric value (0-9)
+	for _, v := range p {
+		//This checks each character for a numeric value (0-9)
 		if v < '0' || v > '9' {
-            return false
-        }
-    }
-    return len(p) >= 4
+			return false
+		}
+	}
+	return len(p) >= 4
 }
+
 type AccountCode struct {
 	AccountCodeID int64
-	AccountID int64
-	Code string
-	Label string
-	IsActive bool
-	IsUtility bool
-	IsDelivery bool
-	DateStart time.Time
-	DateEnd time.Time
-	TimeStart time.Time
-	TimeEnd time.Time
-	ValidDays []string //2-character abbreviations for days (su, tu, th)
+	AccountID     int32
+	Code          string
+	Label         string
+	IsActive      bool
+	IsUtility     bool
+	IsDelivery    bool
+	DateStart     time.Time
+	DateEnd       time.Time
+	TimeStart     time.Time
+	TimeEnd       time.Time
+	ValidDays     []string //2-character abbreviations for days (su, tu, th)
 
 	//Internal audit fields
-	TimeCreated time.Time
+	TimeCreated  time.Time
 	TimeModified time.Time
 }
 
@@ -50,19 +51,19 @@ func (A AccountCode) TagsString() string {
 	if A.IsDelivery {
 		tags = append(tags, "Delivery")
 	}
-	return strings.Join(tags,", ")
+	return strings.Join(tags, ", ")
 }
 
 func (A AccountCode) HasDay(d string) bool {
-  if len(A.ValidDays) < 1 || len(A.ValidDays) > 6 {
-  	return true
-  }
-  for _, v := range A.ValidDays {
-  	if v == d {
-  		return true
-  	}
-  }
-  return false
+	if len(A.ValidDays) < 1 || len(A.ValidDays) > 6 {
+		return true
+	}
+	for _, v := range A.ValidDays {
+		if v == d {
+			return true
+		}
+	}
+	return false
 }
 
 func (AC AccountCode) WhenValidString() string {
@@ -97,7 +98,9 @@ func (AC AccountCode) WhenValidString() string {
 
 func (AC *AccountCode) IsValid() bool {
 	//General active flag first
-	if !AC.IsActive { return false }
+	if !AC.IsActive {
+		return false
+	}
 	//Check valid dates (if either date is set - both optional)
 	now := time.Now()
 	if !AC.DateStart.IsZero() {
@@ -143,7 +146,6 @@ time_modified integer not null
 	return err
 }
 
-
 // Quick internal functions for joining/splitting DB string
 func combineVDays(days []string) string {
 	//Ensure that strings in DB are all lowercase CSV
@@ -153,7 +155,6 @@ func combineVDays(days []string) string {
 func splitVDays(days string) []string {
 	return strings.Split(days, ",")
 }
-
 
 // internal function to read the rows from the account_code table
 var accountCodeSelect = `select account_code_id, account_id, code, label, is_active, is_utility, is_delivery, date_start, date_end, time_start, time_end, valid_days, time_created, time_modified
@@ -166,7 +167,7 @@ func (D *Database) parseAccountCodeRows(rows *sql.Rows) ([]AccountCode, error) {
 	var v_days string
 	for rows.Next() {
 		var acc AccountCode
-		if err := rows.Scan(&acc.AccountCodeID, 
+		if err := rows.Scan(&acc.AccountCodeID,
 			&acc.AccountID,
 			&acc.Code,
 			&acc.Label,
@@ -211,7 +212,7 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		time_modified) values
 		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		returning account_code_id;`
-	rslt, err := D.ExecSql(q, 
+	rslt, err := D.ExecSql(q,
 		acc.AccountID,
 		acc.Code,
 		acc.Label,
@@ -252,7 +253,7 @@ func (D *Database) AccountCodeUpdate(acc *AccountCode) (*AccountCode, error) {
 		valid_days = ?,
 		time_modified = ?
 		where account_code_id = ?;`
-	_, err := D.ExecSql(q, 
+	_, err := D.ExecSql(q,
 		acc.AccountID,
 		acc.Code,
 		acc.Label,

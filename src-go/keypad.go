@@ -1,12 +1,12 @@
 //go:build !arm
+
 package main
 
-import (
-)
+import ()
 
-type Keypad struct {}
+type Keypad struct{}
 
-func (K *Keypad) StartWatching(chipname string) {
+func (K *Keypad) StartWatching() {
 
 }
 

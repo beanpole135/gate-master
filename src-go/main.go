@@ -8,35 +8,35 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
-const PageTitle = "Shadow Mountain"
-const jwtsecretkey = "testkey" //not critical since we encrypt over the top of this as well
-const tokenLifeS = 3600 // 1 hour lifetime
-
 // staticFS is our static web server content.
+//
 //go:embed static/*
 var staticFS embed.FS
 
 // htmlFS is our static html file templates
+//
 //go:embed html/*
 var htmlFS embed.FS
 
 type Page struct {
-	Title string
-	Token *AuthToken
-	Profile *Account
-	Accounts []Account
+	Title        string
+	Token        *AuthToken
+	Profile      *Account
+	Accounts     []Account
 	AccountCodes []AccountCode
-	AccountCode AccountCode
-	GateLogs []GateLog
-	GateLog *GateLog
-	Contacts []Contact
+	AccountCode  AccountCode
+	GateLogs     []GateLog
+	GateLog      *GateLog
+	Contacts     []Contact
+	Contact      *Contact
 }
 
 var templates *template.Template
-var Cam *Camera
+var CAM *Camera
 var DB *Database
 var CONFIG *Config
 
@@ -56,14 +56,16 @@ func main() {
 	exitErr(err, "Could not load Templates: %v")
 
 	//Setup the Camera
-	Cam, err := NewCamera()
+	CAM, err = NewCamera()
 	exitErr(err, "Could not create Camera: %v")
-	defer Cam.Close()
+	defer CAM.Close()
 
 	//Setup the Database
 	DB, err = NewDatabase(CONFIG.DbFile)
 	exitErr(err, "Could not create database: %v")
 	defer DB.Close()
+
+	CONFIG.Keypad.StartWatching()
 
 	//Setup the HTTP auth system
 	setupSecureCookies()
@@ -71,8 +73,8 @@ func main() {
 	//Setup the pages / endpoints
 	http.HandleFunc("/favicon.ico", favicon)
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
-	http.HandleFunc("/stream", checkToken(Cam.ServeImages, true, false))
-	
+	http.HandleFunc("/stream", checkToken(CAM.ServeImages, true, false))
+
 	// Individual Pages
 	setupPages()
 	// Final setup
@@ -85,10 +87,10 @@ func main() {
 
 func favicon(w http.ResponseWriter, r *http.Request) {
 	data, err := staticFS.ReadFile("static/favicon.ico")
-    if err != nil { 
-    	fmt.Println("favicon.ico loading error", err)
-    }
-    http.ServeContent(w, r, "favicon.ico", time.Now(), bytes.NewReader(data))
+	if err != nil {
+		fmt.Println("favicon.ico loading error", err)
+	}
+	http.ServeContent(w, r, "favicon.ico", time.Now(), bytes.NewReader(data))
 }
 
 // Internal functions for loading pages
@@ -109,7 +111,7 @@ func handleError(w http.ResponseWriter, r *http.Request) {
 func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToken bool, adminonly bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := &Page{
-			Title: PageTitle,
+			Title: CONFIG.SiteName,
 		}
 		if validateToken {
 			toks := ReadSecureCookieTokens(w, r)
@@ -118,7 +120,7 @@ func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToke
 				handleError(w, r)
 				return
 			}
-			tok, err := ReadSignedToken(toks, jwtsecretkey, true)
+			tok, err := ReadSignedToken(toks, CONFIG.JwtSecret, true)
 			if err != nil {
 				fmt.Println("Got Token verify error:", err)
 				handleError(w, r)
@@ -137,6 +139,13 @@ func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToke
 
 func returnError(w http.ResponseWriter, msg string) {
 	fmt.Println("Got error to return:", msg)
+	msg = strings.ReplaceAll(msg, "\"", "\\\"")
 	w.Header().Add("HX-Trigger", fmt.Sprintf(`{"showError": "%s"}`, msg))
+	http.Error(w, msg, http.StatusBadRequest)
+}
+
+func returnSuccess(w http.ResponseWriter, msg string) {
+	msg = strings.ReplaceAll(msg, "\"", "\\\"")
+	w.Header().Add("HX-Trigger", fmt.Sprintf(`{"showSuccess": "%s"}`, msg))
 	http.Error(w, msg, http.StatusBadRequest)
 }

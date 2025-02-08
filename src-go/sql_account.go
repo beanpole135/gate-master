@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	Account_Active = 1
+	Account_Active   = 1
 	Account_Inactive = 2
-	Account_Admin = 3
+	Account_Admin    = 3
 )
 
 func hashPassword(pw string) string {
@@ -23,7 +23,7 @@ func hashPassword(pw string) string {
 	return string(hash)
 }
 
-func validatePasswordFormat(pw string) (bool, string){
+func validatePasswordFormat(pw string) (bool, string) {
 	var reasons []string
 	if len(pw) < 3 {
 		reasons = append(reasons, "3+ character minimum")
@@ -32,20 +32,20 @@ func validatePasswordFormat(pw string) (bool, string){
 		reasons = append(reasons, "no spaces")
 	}
 	if len(reasons) > 0 {
-		return false, strings.Join(reasons,", ")
+		return false, strings.Join(reasons, ", ")
 	}
 	return true, ""
 }
 
 type Account struct {
-	AccountID int32
-	FirstName string
-	LastName string
-	Username string
-	PwHash string
+	AccountID     int32
+	FirstName     string
+	LastName      string
+	Username      string
+	PwHash        string
 	AccountStatus int
-	TimeCreated time.Time
-	TimeModified time.Time
+	TimeCreated   time.Time
+	TimeModified  time.Time
 }
 
 func (A Account) Status() string {
@@ -66,15 +66,15 @@ func (A Account) StatusValue() string {
 }
 
 func DefaultAdminAccount() *Account {
-return &Account{
-			AccountID: -1,
-			FirstName: "admin",
-			LastName: "admin",
-			Username: "admin",
-			AccountStatus: Account_Admin,
-			TimeCreated: time.Now(),
-			TimeModified: time.Now(),
-		}
+	return &Account{
+		AccountID:     -1,
+		FirstName:     "admin",
+		LastName:      "admin",
+		Username:      "admin",
+		AccountStatus: Account_Admin,
+		TimeCreated:   time.Now(),
+		TimeModified:  time.Now(),
+	}
 }
 
 func (D *Database) CreateAccTable() error {
@@ -178,7 +178,7 @@ func (D *Database) AccountUpdate(acc *Account) (*Account, error) {
 		_, err := D.ExecSql(q, acc.FirstName, acc.LastName, acc.Username, acc.AccountStatus, D.TimeNow(), acc.AccountID)
 		if err != nil {
 			return nil, err
-		}		
+		}
 	}
 	return acc, nil
 }

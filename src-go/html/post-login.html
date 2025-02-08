@@ -7,6 +7,7 @@
         More <i class="fa fa-caret-down"></i>
         <div class="menucontent">
           <button class="tabbutton" hx-post="/page-profile" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-user"></i> My Profile</button>
+          <button class="tabbutton" hx-post="/page-contacts" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-envelope-o"></i> My Contacts</button>
           <button class="tabbutton" hx-post="/page-accountcodes" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-key"></i> My PIN Codes</button>
           {{if .Token.IsAdmin}}
           <hr>

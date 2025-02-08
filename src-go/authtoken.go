@@ -9,7 +9,7 @@ import (
 )
 
 type AuthToken struct {
-	UserId int32
+	UserId  int32
 	IsAdmin bool
 }
 
@@ -23,13 +23,13 @@ func CreateSignedToken(ct AuthToken, jwtSecretKey string, expiresIn int) (string
 		//Standard IANA claims (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1)
 		//"iss":            claims["iss"],		//ISSuer: Optional use - no need for it at the moment (sig verify is enough)
 		//"sub":            claims["sub"],		//SUBject: Optional use - no need for it at the moment (sig verify is enough)
-		"aud": ct.UserId,                        //real AUDience: Optional use - we will put the database User ID here.
+		"aud": ct.UserId,                            //real AUDience: Optional use - we will put the database User ID here.
 		"nbf": time.Now().Unix() - 5,                //Not BeFore: Unix Timestamp (allow 5s margin for clock skew)
 		"iat": time.Now().Unix(),                    //Issued AT: Unix Timestamp
 		"exp": time.Now().Unix() + int64(expiresIn), //EXPires: Unix Timestamp
 		//Non-standard / Custom Claims
 		"iad": ct.IsAdmin, //Is ADmin
-		
+
 	})
 
 	// Sign and get the complete encoded token as a string using the secret

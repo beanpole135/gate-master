@@ -9,7 +9,7 @@ var timelocation *time.Location
 
 func inittimelocation() {
 	if timelocation == nil {
-		 timelocation, _ = time.LoadLocation("America/New_York")
+		timelocation, _ = time.LoadLocation("America/New_York")
 	}
 }
 
@@ -38,14 +38,22 @@ func nowValidWeekday(valid []string) bool {
 	}
 	nowday := ""
 	switch time.Now().Weekday() {
-	case time.Sunday: nowday = "su"
-	case time.Monday: nowday = "mo"
-	case time.Tuesday: nowday = "tu"
-	case time.Wednesday: nowday = "we"
-	case time.Thursday: nowday = "th"
-	case time.Friday: nowday = "fr"
-	case time.Saturday: nowday = "sa"
-	default: return false
+	case time.Sunday:
+		nowday = "su"
+	case time.Monday:
+		nowday = "mo"
+	case time.Tuesday:
+		nowday = "tu"
+	case time.Wednesday:
+		nowday = "we"
+	case time.Thursday:
+		nowday = "th"
+	case time.Friday:
+		nowday = "fr"
+	case time.Saturday:
+		nowday = "sa"
+	default:
+		return false
 	}
 	isvalid := false
 	for _, vd := range valid {

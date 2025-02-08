@@ -14,7 +14,7 @@
 
 {{define "footer"}}
 <div id="errorbox">
-  <h3><i>WARNING</i></h3>
+  <h3 ><i id="errorheader">WARNING</i></h3>
   <p id="errortext">Some text here!!</p>
 </div>
 </body>
@@ -23,6 +23,17 @@
 <script>
   document.body.addEventListener("showError", function(evt){
    document.getElementById('errortext').innerHTML = evt.detail.value;
+   document.getElementById('errorheader').innerHTML = "WARNING";
+   document.getElementById('errorbox').style.backgroundColor = "darkred";
+   document.getElementById('errorbox').style.opacity = 1;
+   setTimeout(function () { 
+      document.getElementById('errorbox').style.opacity = 0;
+   }, 2000);
+  });
+  document.body.addEventListener("showSuccess", function(evt){
+   document.getElementById('errortext').innerHTML = evt.detail.value;
+   document.getElementById('errorheader').innerHTML = "SUCCESS";
+   document.getElementById('errorbox').style.backgroundColor = "darkgreen";
    document.getElementById('errorbox').style.opacity = 1;
    setTimeout(function () { 
       document.getElementById('errorbox').style.opacity = 0;

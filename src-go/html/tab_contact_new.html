@@ -19,13 +19,14 @@
 	<label for="email" title="Email address (if Email Only), or a phone number for text notifications">Email or Phone #:</label>
 	<input type="text" id="email" name="email" required>
 	<hr style="grid-column: 1 / span 2;">
-	<h2 style="grid-column: 1 / span 2;">Notification Tags</h2>
-	<label for="isprimary" title="Use this contact for account-related communications (password changes, etc)?">Account Contact</label>
-	<input type="checkbox" id="isprimary" name = "isprimary">
-	<label for="isutility">Is Utility Company?</label>
+	<h2 style="grid-column: 1 / span 2;">Notifications</h2>
+	<p style="grid-column: 1 / span 2;">Send a notification to this contact when one of the following types of gate codes is used. At least one should be enabled.</p>
+	<label for="isutility">Utility Company</label>
 	<input type="checkbox" id="isutility" name = "isutility">
-	<label for="isdelivery">Is Delivery Company?</label>
+	<label for="isdelivery">Delivery Company</label>
 	<input type="checkbox" id="isdelivery" name = "isdelivery">
+	<label for="isprimary">Everything Else</label>
+	<input type="checkbox" id="isprimary" name = "isprimary">
 
 	<button hx-post="/contact-create" hx-target="#contacttab" hx-swap="outerHTML" hx-include="closest form" style="grid-column: 1 / span 2;">Create Contact</button>
 </form>

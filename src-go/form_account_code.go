@@ -46,7 +46,7 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 		return AC, fmt.Errorf("Missing PIN Code")
 	}
 	if code != "" && !validatePinCodeFormat(code) {
-		return AC, fmt.Errorf("PIN code must be 4 or more numbers")	
+		return AC, fmt.Errorf("PIN code must be 4 or more numbers")
 	}
 	if label == "" && AC.Label == "" {
 		return AC, fmt.Errorf("Missing Description")
@@ -57,7 +57,7 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	}
 
 	// Populate the accountcode fields
-	if code != "" && AC.Code == ""{
+	if code != "" && AC.Code == "" {
 		//Can only set PIN code for new accountcodes (no changing later)
 		AC.Code = code
 	}
@@ -68,13 +68,27 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	AC.IsUtility = is_utility
 	AC.IsDelivery = is_delivery
 	AC.ValidDays = []string{} //Reset and reload
-	if day_Su { AC.ValidDays = append(AC.ValidDays, "su") }
-	if day_Mo { AC.ValidDays = append(AC.ValidDays, "mo") }
-	if day_Tu { AC.ValidDays = append(AC.ValidDays, "tu") }
-	if day_We { AC.ValidDays = append(AC.ValidDays, "we") }
-	if day_Th { AC.ValidDays = append(AC.ValidDays, "th") }
-	if day_Fr { AC.ValidDays = append(AC.ValidDays, "fr") }
-	if day_Sa { AC.ValidDays = append(AC.ValidDays, "sa") }
+	if day_Su {
+		AC.ValidDays = append(AC.ValidDays, "su")
+	}
+	if day_Mo {
+		AC.ValidDays = append(AC.ValidDays, "mo")
+	}
+	if day_Tu {
+		AC.ValidDays = append(AC.ValidDays, "tu")
+	}
+	if day_We {
+		AC.ValidDays = append(AC.ValidDays, "we")
+	}
+	if day_Th {
+		AC.ValidDays = append(AC.ValidDays, "th")
+	}
+	if day_Fr {
+		AC.ValidDays = append(AC.ValidDays, "fr")
+	}
+	if day_Sa {
+		AC.ValidDays = append(AC.ValidDays, "sa")
+	}
 	if date_start != nil {
 		AC.DateStart = *date_start
 	} else {

@@ -6,14 +6,14 @@ import (
 )
 
 type GateLog struct {
-	LogID int64
-	AccountID int32
-	OpenedName string
-	UsedCode string
-	UsedWeb bool
-	CodeTags string
+	LogID       int64
+	AccountID   int32
+	OpenedName  string
+	UsedCode    string
+	UsedWeb     bool
+	CodeTags    string
 	GatePicture []byte
-	TimeOpened time.Time
+	TimeOpened  time.Time
 }
 
 func (G GateLog) OpenedBy() string {
@@ -29,7 +29,6 @@ func (G GateLog) ShowPIN(accid int32) string {
 	}
 	return "****"
 }
-
 
 func (D *Database) CreateGateLogTable() error {
 	q := `create table if not exists gatelog (

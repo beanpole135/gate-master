@@ -8,17 +8,17 @@ import (
 )
 
 type Contact struct {
-	ContactID int64
-	AccountID int32
-	Email string
-	PhoneNum string
-	CellType string
-	IsPrimary bool
-	IsActive bool
-	IsUtility bool
+	ContactID  int64
+	AccountID  int32
+	Email      string
+	PhoneNum   string
+	CellType   string
+	IsPrimary  bool
+	IsActive   bool
+	IsUtility  bool
 	IsDelivery bool
 	//Internal audit fields
-	TimeCreated time.Time
+	TimeCreated  time.Time
 	TimeModified time.Time
 }
 
@@ -34,7 +34,7 @@ func (C Contact) Display() string {
 	if C.Email != "" {
 		return C.Email
 	}
-	return fmt.Sprintf("%s (%s)", C.PhoneNum, strings.ToUpper(C.CellType))
+	return fmt.Sprintf("%s (%s)", DisplayPhone(C.PhoneNum), strings.ToUpper(C.CellType))
 }
 
 func (C Contact) StatusValue() string {
@@ -58,6 +58,23 @@ func (C Contact) ContactValue() string {
 	return C.PhoneNum
 }
 
+func (C Contact) NotifyTags() string {
+	var tags []string
+	if C.IsUtility {
+		tags = append(tags, "Utility")
+	}
+	if C.IsDelivery {
+		tags = append(tags, "Delivery")
+	}
+	if C.IsPrimary {
+		tags = append(tags, "Other")
+	}
+	if len(tags) == 3 {
+		return "All"
+	}
+	return strings.Join(tags, ", ")
+}
+
 func (D *Database) CreateContactTable() error {
 	q := `create table if not exists contact (
 contact_id integer primary key autoincrement,
@@ -77,6 +94,7 @@ time_modified integer not null
 }
 
 const contactquery = `select contact_id, account_id, email, phone_num, cell_type, is_primary, is_active, is_utility, is_delivery, time_created, time_modified from contact`
+
 // internal function to read the rows from the table
 func (D *Database) parseContactRows(rows *sql.Rows, with_picture bool) ([]Contact, error) {
 	defer rows.Close()
@@ -123,7 +141,7 @@ func (D *Database) ContactUpdate(c *Contact) (*Contact, error) {
 		is_delivery = ?,
 		time_modified = ?
 		where contact_id = ? and account_id = ?;`
-	_, err := D.ExecSql(q, 
+	_, err := D.ExecSql(q,
 		c.Email,
 		c.PhoneNum,
 		c.CellType,
@@ -153,6 +171,36 @@ func (D *Database) ContactSelectAll() ([]Contact, error) {
 func (D *Database) ContactsForAccount(accId int64) ([]Contact, error) {
 	q := contactquery + ` where account_id = ?;`
 	rows, err := D.QuerySql(q, accId)
+	if err != nil {
+		return nil, err
+	}
+	return D.parseContactRows(rows, true)
+}
+
+func (D *Database) ContactsForAllNotify(isUtility, isDelivery bool) ([]Contact, error) {
+	q := contactquery + ` where is_active = true`
+	qlist := []string{}
+	if isUtility {
+		qlist = append(qlist, "is_utility = true")
+	}
+	if isDelivery {
+		qlist = append(qlist, "is_delivery = true")
+	}
+	if len(qlist) > 0 {
+		q += " and (" + strings.Join(qlist, " or ") + ");"
+	} else {
+		q += ";"
+	}
+	rows, err := D.QuerySql(q)
+	if err != nil {
+		return nil, err
+	}
+	return D.parseContactRows(rows, true)
+}
+
+func (D *Database) ContactsForAccountNotify(accid int32) ([]Contact, error) {
+	q := contactquery + ` where account_id = ? and is_active = true and is_primary = true`
+	rows, err := D.QuerySql(q, accid)
 	if err != nil {
 		return nil, err
 	}

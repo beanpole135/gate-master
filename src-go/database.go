@@ -13,20 +13,24 @@ const YearsRetentionPolicy = 1
 
 type Database struct {
 	filepath string
-	db *sql.DB
+	db       *sql.DB
 }
 
 var blankdatabase bool = false
 
 func NewDatabase(filepath string) (*Database, error) {
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	file.Close()
 	D := Database{
 		filepath: filepath,
 	}
 	D.db, err = sql.Open("sqlite3", filepath)
-	if err != nil { return nil, err}
+	if err != nil {
+		return nil, err
+	}
 	if !D.TablesExist() {
 		err = D.CreateTables()
 	}
@@ -71,8 +75,8 @@ func (D *Database) CreateTables() error {
 
 func (D *Database) PruneTables() {
 	//This is designed to be started as a background goroutine from main.go ONLY
-	for range time.Tick(24*time.Hour) {
-		ya := time.Now().AddDate(-YearsRetentionPolicy,0,0) //years ago
+	for range time.Tick(24 * time.Hour) {
+		ya := time.Now().AddDate(-YearsRetentionPolicy, 0, 0) //years ago
 		err := D.PruneGateLogs(ya)
 		if err != nil {
 			fmt.Println("Got error pruning GateLogs before %v: %v", ya, err)
@@ -101,7 +105,7 @@ func (D *Database) QuerySql(query string, args ...any) (*sql.Rows, error) {
 	return D.db.Query(query, args...)
 }
 
-//Time conversion functions
+// Time conversion functions
 func (D *Database) TimeNow() int64 {
 	return time.Now().Unix()
 }

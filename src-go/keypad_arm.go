@@ -1,4 +1,5 @@
 //go:build arm
+
 package main
 
 import (
@@ -6,46 +7,40 @@ import (
 	"github.com/warthog618/go-gpiocdev"
 )
 
-type Key int
-const (
-	Key_0  Key = iota
-	Key_1
-	Key_2
-	Key_3
-	Key_4
-	Key_5
-	Key_6
-	Key_7
-	Key_8
-	Key_9
-	Key_Enter
-	Key_Clear
-)
+/*
+	4x3 Keypad
+	 [1, 2, 3]
+	 [4, 5, 6]
+	 [7, 8, 9]
+	 [*, 0, #]
 
-// Map of our internal keys to the RPI offset
-keymap := make(map[Key]int){
-	0: Key_0,
-	1: Key_1,
-	3: Key_2,
-	5: Key_3,
-	7: Key_4,
-	9: Key_5,
-	11: Key_6,
-	13: Key_7,
-	15: Key_8,
-	17: Key_9,
-	2: Key_Enter,
-	4: Key_Clear,
-}
-
-
+Examples:
+R1 + C1 = Key "1"
+R2 + C3 = Key "6"
+*/
 type Keypad struct {
-	lines []gpiocdev.Line
+	// Configuration from file
+	Chipname string `json:"chipname"`
+	R1       int    `json:"row1"`
+	R2       int    `json:"row2"`
+	R3       int    `json:"row3"`
+	R4       int    `json:"row4"`
+	C1       int    `json:"col1"`
+	C2       int    `json:"col2"`
+	C3       int    `json:"col3"`
+	// Internal variables
+	lines   []gpiocdev.Line `json:"-"`
+	pressed int             `json:"-"` //count of lines pressed right now
+	up      map[int]bool    `json:"-"`
 }
 
-func (K *Keypad) StartWatching(chipname string) {
-	for offset, key := range keymap {
-		l, _ = gpiocdev.RequestLine(chipname, offset, gpiocdev.WithEventHandler(K.handler), gpiocdev.WithFallingEdge)
+func (K *Keypad) StartWatching() {
+	offsets = []int{K.R1, K.R2, K.R3, K.R4, K.C1, K.C2, K.C3}
+	K.up = make(map[int]bool)
+	for _, offset := range offsets {
+		K.up[offset] = false
+		l, _ = gpiocdev.RequestLine(K.Chipname, offset, gpiocdev.WithEventHandler(K.handler), gpiocdev.WithBothEdges)
+		K.lines = append(K.lines, l)
 	}
 }
 
@@ -68,36 +63,62 @@ func (K *Keypad) ClearPressed() {
 }
 
 func (K *Keypad) handler(evt gpiocdev.LineEvent) {
-	//Fetch the offset and convert back to our internal key enum
-	fmt.Println("Got Keypress with offset:", evt.Offset)
-	key, ok := keymap[evt.Offset]
-	if !ok { 
+	// When a pair of row/col lines are "pressed"
+	// - that indicates a particular button itself was pressed
+	fmt.Println("Got Keypress with offset:", evt.Offset, "RisingEdge:", evt.Type == gpiocdev.LineEventRisingEdge)
+	if evt.Type == gpiocdev.LineEventRisingEdge {
+		//Mark this row/column as "pressed"
+		K.up[evt.Offset] = true
+		K.pressed += 1
+	} else {
+		//Remove this row/column from "pressed"
+		K.up[evt.Offset] = false
+		K.pressed -= 1
+		return //Stop processing here for releases of keys
+	}
+	if K.pressed != 2 {
 		return
 	}
-	switch key {
-	case Key_Enter:
-		K.EnterPressed()
-	case Key_Clear:
-		K.ClearPressed()
-	case Key_0:
-		K.NumPressed(0)
-	case Key_1:
-		K.NumPressed(1)
-	case Key_2:
-		K.NumPressed(2)
-	case Key_3:
-		K.NumPressed(3)
-	case Key_4:
-		K.NumPressed(4)
-	case Key_5:
-		K.NumPressed(5)
-	case Key_6:
-		K.NumPressed(6)
-	case Key_7:
-		K.NumPressed(7)
-	case Key_8:
-		K.NumPressed(8)
-	case Key_9:
-		K.NumPressed(9)
+	//Now look for all the row/column pairs and see what is there
+	if K.Pressed(K.R1) {
+		if K.Pressed(K.C1) {
+			K.NumPressed(1)
+		} else if K.Pressed(K.C2) {
+			K.NumPressed(2)
+		} else if K.Pressed(K.C3) {
+			K.NumPressed(3)
+		}
+	} else if K.Pressed(K.R2) {
+		if K.Pressed(K.C1) {
+			K.NumPressed(4)
+		} else if K.Pressed(K.C2) {
+			K.NumPressed(5)
+		} else if K.Pressed(K.C3) {
+			K.NumPressed(6)
+		}
+	} else if K.Pressed(K.R3) {
+		if K.Pressed(K.C1) {
+			K.NumPressed(7)
+		} else if K.Pressed(K.C2) {
+			K.NumPressed(8)
+		} else if K.Pressed(K.C3) {
+			K.NumPressed(9)
+		}
+	} else if K.Pressed(K.R4) {
+		if K.Pressed(K.C1) {
+			K.ClearPressed() // * key
+		} else if K.Pressed(K.C2) {
+			K.NumPressed(1)
+		} else if K.Pressed(K.C3) {
+			K.EnterPressed() // # key
+		}
 	}
+}
+
+func (K *Keypad) Pressed(offset int) {
+	v, ok := K.up[offset]
+	if !ok || v == false {
+		return false
+	}
+	return true
 }
