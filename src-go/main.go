@@ -51,6 +51,9 @@ func main() {
 	var err error
 	//Load the config file
 	CONFIG, err = LoadConfig("config.json")
+	if err != nil {
+		fmt.Println("Could not read config - using defaults:", err)
+	}
 	//Load the HTML templates (built-in)
 	templates, err = template.ParseFS(htmlFS, "html/*.html")
 	exitErr(err, "Could not load Templates: %v")
@@ -120,7 +123,7 @@ func checkToken(fn func(http.ResponseWriter, *http.Request, *Page), validateToke
 				handleError(w, r)
 				return
 			}
-			tok, err := ReadSignedToken(toks, CONFIG.JwtSecret, true)
+			tok, err := ReadSignedToken(toks, CONFIG.Auth.JwtSecret, true)
 			if err != nil {
 				fmt.Println("Got Token verify error:", err)
 				handleError(w, r)

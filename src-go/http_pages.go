@@ -76,7 +76,7 @@ func performLoginHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 		UserId:  int32(acct.AccountID),
 		IsAdmin: (acct.AccountStatus == Account_Admin),
 	}
-	tok, err := CreateSignedToken(at, CONFIG.JwtSecret, CONFIG.JwtTokenSecs)
+	tok, err := CreateSignedToken(at, CONFIG.Auth.JwtSecret, CONFIG.Auth.JwtTokenSecs)
 	if err != nil {
 		fmt.Println("Cannot create signed token:", err)
 		returnError(w, "Internal Error")

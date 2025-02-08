@@ -6,7 +6,7 @@
 	<label for="code">PIN (numbers only):</label>
 	<input type="text" id="code" name="code" value="{{.AccountCode.Code}}" disabled>
 	<label for="label">Description:</label>
-	<input type="text" id="label" name = "label" value="{{.AccountCode.Label}}" required>
+	<input type="text" id="label" name = "label" value="{{.AccountCode.Label}}" placeholder="who will use this code?" required>
 	<label for="isactive">Is Active?</label>
 	<input type="checkbox" id="isactive" name = "isactive" {{if .AccountCode.IsActive}}checked{{end}}>
 	<hr style="grid-column: 1 / span 2;">
