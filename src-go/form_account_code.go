@@ -54,9 +54,13 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	if label == "" && AC.Label == "" {
 		return AC, fmt.Errorf("Missing Description")
 	}
-
-	if (time_start != nil && time_end == nil) || (time_start == nil && time_end != nil) {
-		return AC, fmt.Errorf("Both start and end times must be provided, or neither of them")
+	if time_start == nil {
+		tn := time.Now()
+		time_start = &tn
+	}
+	startPlus1year := time_start.AddDate(1, 0, 0)
+	if time_end == nil || time_end.After(startPlus1year) || time_end.Before(*time_start) {
+		time_end = &startPlus1year
 	}
 
 	// Populate the accountcode fields
