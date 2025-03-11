@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -48,6 +49,8 @@ func exitErr(err error, msg string) {
 }
 
 func main() {
+	// Seed random number generator
+	rand.Seed(time.Now().UnixNano())
 	var err error
 	//Load the config file
 	CONFIG, err = LoadConfig("config.json")
@@ -151,4 +154,25 @@ func returnSuccess(w http.ResponseWriter, msg string) {
 	msg = strings.ReplaceAll(msg, "\"", "\\\"")
 	w.Header().Add("HX-Trigger", fmt.Sprintf(`{"showSuccess": "%s"}`, msg))
 	http.Error(w, msg, http.StatusBadRequest)
+}
+
+// Simple randomization functions
+const letterBytes = "abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789"
+func RandomString(length int) string {
+    b := make([]byte, length)
+    for i := range b {
+        b[i] = letterBytes[rand.Intn(len(letterBytes))]
+    }
+    fmt.Println("Generated Random String:", string(b))
+    return string(b)
+}
+
+const numberBytes = "0123456789"
+func RandomPIN(length int) string {
+    b := make([]byte, length)
+    for i := range b {
+        b[i] = numberBytes[rand.Intn(len(numberBytes))]
+    }
+    fmt.Println("Generated Random PIN:", string(b))
+    return string(b)
 }

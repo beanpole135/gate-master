@@ -6,6 +6,7 @@
         <input type="text" id="uname" name="uname" placeholder="Email"/>
         <input type="password" id="passw" name="passw" placeholder="password"/>
         <button hx-post="/auth-login" hx-include="#uname, #passw" hx-target="#mainbody" hx-swap="outerHTML"><i class="fa fa-sign-in"></i> Login</button>
+        <button hx-post="/auth-pwreset" hx-include="#uname" hx-target="#mainbody" hx-swap="outerHTML" style="background: none; border: none; color: #000000; font-size: x-small; font-style: italic; margin-top: 1em;">Forgot your password?</button>
       </form>
     </form>
   </div>

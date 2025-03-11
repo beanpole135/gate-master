@@ -12,10 +12,6 @@
 	<hr style="grid-column: 1 / span 2;">
 	<label for="uname">Login Email:</label>
 	<input type="text" id="uname" name = "uname" required>
-	<!--<label for="newpw">Password:</label>
-	<input id="newpw" name="newpw" type="password">
-	<label for="newpw2">Password (repeat):</label>
-	<input id="newpw2" name="newpw2" type="password">-->
 	<button hx-post="/account-create" hx-target="#accounttab" hx-swap="outerHTML" hx-include="#fname, #lname, #newpw, #newpw2, #isadmin" style="grid-column: 1 / span 2;">Create Account</button>
 </form>
 

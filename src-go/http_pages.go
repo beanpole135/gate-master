@@ -14,6 +14,7 @@ func setupPages() {
 	http.HandleFunc("/login", checkToken(loginPageHandler, false, false))
 	http.HandleFunc("/auth-login", checkToken(performLoginHandler, false, false))
 	http.HandleFunc("/auth-logout", checkToken(performLogoutHandler, true, false))
+	http.HandleFunc("/auth-pwreset", checkToken(performPWResetHandler, false, false))
 	// Main Page (parent of all tabs)
 	http.HandleFunc("/gate", checkToken(gatePageHandler, true, false))
 	// View Tab
@@ -92,6 +93,37 @@ func performLogoutHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 	DeleteTokenCookie(w, r)
 	// Redirect back to the login page
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func performPWResetHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	//Grab the email from the username field
+	r.ParseForm()
+	user := r.Form.Get("uname")
+	// Verify email
+	if !isValidEmail(user) {
+		returnError(w, "Please enter a valid email first")
+		return
+	}
+
+	// Verify validity of account
+	acc, err := DB.AccountFromUser(user)
+	if err == nil && acc != nil {
+		newpw := RandomString(10)
+		acc.TempPwHash = hashPassword(newpw)
+		DB.AccountUpdate(acc)
+		// Now send an email to the user with the temporary password
+		CONFIG.Email.SendEmail(
+			user,
+			CONFIG.SiteName+" Password Reset",
+			fmt.Sprintf("A password reset has been requested for you at %s.\nPlease login and change your password as soon as possible.\n\nYour temporary password is:  %s",
+				CONFIG.Host,
+				newpw,
+			),
+			true,
+		)
+	}
+	time.Sleep(1 * time.Second)
+	returnSuccess(w, "An email with a temporary password has been sent to "+user)
 }
 
 func gatePageHandler(w http.ResponseWriter, r *http.Request, p *Page) {
@@ -327,7 +359,7 @@ func performAccountCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 	uname := r.Form.Get("uname") //This is expected to be an email address
 	fname := r.Form.Get("fname")
 	lname := r.Form.Get("lname")
-	newpw := "TEST1234" //randomize this later
+	newpw := RandomString(10)
 	//newpw2 := r.Form.Get("newpw2")
 	isadmin := r.Form.Get("isadmin") == formChecked
 	// Validate the inputs
@@ -354,7 +386,7 @@ func performAccountCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 		LastName:      lname,
 		Username:      uname,
 		AccountStatus: accstatus,
-		PwHash:        hashPassword(newpw),
+		TempPwHash:    hashPassword(newpw),
 	}
 	nacc, err := DB.AccountInsert(&acc)
 	if err != nil {
@@ -446,11 +478,24 @@ func performAccountcodeCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 	}
 	acc.AccountID = p.Token.UserId //Always associate new PIN with current user account
 	acc.IsActive = true            //new PINs are always active initially
+	if acc.CodeLength < 4 {
+		acc.CodeLength = 4
+	}
+	acc.Code = RandomPIN(acc.CodeLength)
 
 	// New Code Validation
-	if ac, _ := DB.AccountCodeMatch(acc.Code); ac != nil {
-		returnError(w, "Invalid PIN - pick another one")
-		return
+	tries := 1000 //max number of tries before erroring (should never be a problem)
+	for {
+		if ac, _ := DB.AccountCodeMatch(acc.Code); ac != nil {
+			if tries <= 0 {
+				returnError(w, "Internal error creating PIN code")
+				return
+			}
+			acc.Code = RandomPIN(acc.CodeLength)
+			tries -= 1
+		} else {
+			break //got a good/new PIN
+		}
 	}
 
 	// Create the new code

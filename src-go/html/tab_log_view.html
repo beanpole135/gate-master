@@ -10,7 +10,10 @@
 	<p id="3" name="3">{{.GateLog.CodeTags}}</p>
 	<label for="4">Opened By:</label>
 	<p id="4" name="4">{{.GateLog.OpenedName}}</p>
-
+	{{if .GateLog.HasImage}}
+	<hr>
+	<img src="data:image/png;base64,{{.GateLog.ImageBase64}}">
+	{{end}}
 </form>
 
 </div>

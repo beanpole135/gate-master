@@ -12,6 +12,7 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	r.ParseForm()
 	acodeid := r.Form.Get("acodeid")
 	code := r.Form.Get("code")
+	codelength := parseFormInt(r.Form.Get("codelength"))
 	label := r.Form.Get("label")
 	is_active := r.Form.Get("isactive") == formChecked
 	is_utility := r.Form.Get("isutility") == formChecked
@@ -29,6 +30,7 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	day_Sa := r.Form.Get("d_saturday") == formChecked
 
 	AC := AccountCode{}
+	AC.CodeLength = codelength
 	if acodeid != "" {
 		//Loading a pre-exising account code
 		num, err := strconv.ParseInt(acodeid, 10, 64)
@@ -42,12 +44,13 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 		AC = list[0]
 	}
 	// Validate the inputs
-	if code == "" && AC.Code == "" {
+	if code == "" && AC.Code == "" && codelength == 0 {
 		return AC, fmt.Errorf("Missing PIN Code")
 	}
 	if code != "" && !validatePinCodeFormat(code) {
 		return AC, fmt.Errorf("PIN code must be 4 or more numbers")
 	}
+
 	if label == "" && AC.Label == "" {
 		return AC, fmt.Errorf("Missing Description")
 	}

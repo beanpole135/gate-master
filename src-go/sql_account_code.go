@@ -21,6 +21,7 @@ type AccountCode struct {
 	AccountCodeID int64
 	AccountID     int32
 	Code          string
+	CodeLength    int      //Not stored in database - temporary variable
 	Label         string
 	IsActive      bool
 	IsUtility     bool
@@ -228,6 +229,7 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		D.TimeNow(),
 	)
 	if err != nil {
+		fmt.Println("Error Inserting AccountCode:", err)
 		return nil, err
 	}
 	acc.AccountCodeID, err = rslt.LastInsertId()
@@ -269,6 +271,7 @@ func (D *Database) AccountCodeUpdate(acc *AccountCode) (*AccountCode, error) {
 		acc.AccountCodeID,
 	)
 	if err != nil {
+		fmt.Println("Error Updating AccountCode:", err)
 		return nil, err
 	}
 	return acc, err
@@ -292,6 +295,7 @@ func (D *Database) AccountCodeSelectAll(accountid int32, accCodeID int64) ([]Acc
 	}
 	rows, err := D.QuerySql(q+";", args...)
 	if err != nil {
+		fmt.Println("Error Selecting All AccountCode:", err)
 		return nil, err
 	}
 	return D.parseAccountCodeRows(rows)
@@ -301,6 +305,7 @@ func (D *Database) AccountCodeMatch(code string) (*AccountCode, error) {
 	q := accountCodeSelect + " where code = ?;"
 	rows, err := D.QuerySql(q, code)
 	if err != nil {
+		fmt.Println("Error Selecting AccountCode from code:", err)
 		return nil, err
 	}
 	accounts, err2 := D.parseAccountCodeRows(rows)
@@ -317,5 +322,8 @@ func (D *Database) AccountCodeMatch(code string) (*AccountCode, error) {
 func (D *Database) PruneAccountCodes(before time.Time) error {
 	q := `DELETE from account_code where is_active = false and time_modified < ?;`
 	_, err := D.ExecSql(q, D.ToTime(before))
+	if err != nil {
+		fmt.Println("Error Deleting AccountCodes:", err)
+	}
 	return err
 }

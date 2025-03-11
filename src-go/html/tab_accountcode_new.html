@@ -3,8 +3,12 @@
 <form class="grid-form">
 	<h2 style="grid-column: 1 / span 2;">New Gate Code</h2>
 
-	<label for="code">PIN (numbers only):</label>
-	<input type="text" id="code" name="code" placeholder="4 to 8 digit number" required>
+	<label for="codelength">Length of PIN:</label>
+	<select id="codelength" name="codelength" title="Number of digits in PIN" required>
+		<option value="4">4 Digits</option>
+		<option value="6" selected>6 Digits</option>
+		<option value="8">8 Digits</option>
+	</select> 
 	<label for="label">Label:</label>
 	<input type="text" id="label" name = "label" placeholder="Who will use this PIN?" required>
 	<hr style="grid-column: 1 / span 2;">

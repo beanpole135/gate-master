@@ -30,6 +30,10 @@ func (G GateLog) ShowPIN(accid int32) string {
 	return "****"
 }
 
+func (G GateLog) HasImage() bool {
+	return len(G.GatePicture) > 0
+}
+
 func (D *Database) CreateGateLogTable() error {
 	q := `create table if not exists gatelog (
 log_id integer primary key autoincrement,

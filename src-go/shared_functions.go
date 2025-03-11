@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"time"
 )
 
@@ -81,4 +82,13 @@ func parseFormTime(t string) *time.Time {
 		return nil
 	}
 	return &dt
+}
+
+func parseFormInt(i string) int {
+	//Note: Returns "0" for invalid/blank input strings
+	num, err := strconv.Atoi(i)
+	if err != nil {
+		return 0
+	}
+	return num
 }
