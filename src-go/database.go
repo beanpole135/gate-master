@@ -21,7 +21,7 @@ var blankdatabase bool = false
 
 func NewDatabase(fpath string) (*Database, error) {
 	// Make sure the containing folder exists first
-	os.MkdirAll(filepath.Dir(fpath), os.ModeDir)
+	os.MkdirAll(filepath.Dir(fpath), 0700)
 	// Niw open/create the database
 	file, err := os.OpenFile(fpath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
@@ -57,6 +57,7 @@ func (D *Database) TablesExist() bool {
 }
 
 func (D *Database) CreateTables() error {
+	fmt.Println("Creating tables")
 	blankdatabase = true
 	err := D.CreateAccTable()
 	if err != nil {
