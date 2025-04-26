@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3" //SQLite database driver
@@ -18,16 +19,19 @@ type Database struct {
 
 var blankdatabase bool = false
 
-func NewDatabase(filepath string) (*Database, error) {
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0644)
+func NewDatabase(fpath string) (*Database, error) {
+	// Make sure the containing folder exists first
+	os.MkdirAll(filepath.Dir(fpath), os.ModeDir)
+	// Niw open/create the database
+	file, err := os.OpenFile(fpath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
 	}
 	file.Close()
 	D := Database{
-		filepath: filepath,
+		filepath: fpath,
 	}
-	D.db, err = sql.Open("sqlite3", filepath)
+	D.db, err = sql.Open("sqlite3", fpath)
 	if err != nil {
 		return nil, err
 	}
