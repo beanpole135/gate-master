@@ -32,6 +32,7 @@ fi
 
 
 # Install the executable
+sudo systemctl stop gatemaster #in case it is running right now
 sudo cp src-go/gatemaster ${instpath}gatemaster
 if [ $? -ne 0 ] ; then
     echo "Error installing gatemaster executable"
@@ -51,4 +52,5 @@ sudo cp systemd/gatemaster.service "${servicefile}"
 sudo systemctl enable gatemaster
 sudo systemctl restart gatemaster
 
+echo "gatemaster successfully installed and should be running now!"
 
