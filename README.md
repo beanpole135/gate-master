@@ -15,7 +15,7 @@ These need to be installed on the Raspberry Pi before the video system will work
 ## Building for the Raspberry Pi
 Clone the repository onto the Pi itself, and then move into that directory and run the following commands from the terminal:
 
-* Run `./install.sh`
+* Run `bash install.sh`
   * Note that this will use `sudo` to complete the installation and places files into:
     * /usr/local/bin/gatemaster
     * /usr/local/etc/gatemaster.json (Primary config file)

@@ -30,27 +30,25 @@ if [ $? -ne 0 ] ; then
   exit 1
 fi
 
-function run_as_root() {
+
 # Install the executable
-    cp src-go/gatemaster ${instpath}gatemaster
-    if [ $? -ne 0 ] ; then
-        echo "Error installing gatemaster executable"
-        exit 1
-    fi
-    # Install the config file (if not already exists)
-    if [ ! -f "${confpath}gatemaster.json" ] ; then
-        cp src-go/config.json.sample "${confpath}gatemaster.json"
-    fi
-    # Always replace the sample config file
-    cp src-go/config.json.sample "${confpath}gatemaster.json.sample"
+sudo cp src-go/gatemaster ${instpath}gatemaster
+if [ $? -ne 0 ] ; then
+    echo "Error installing gatemaster executable"
+    exit 1
+fi
+# Install the config file (if not already exists)
+if [ ! -f "${confpath}gatemaster.json" ] ; then
+    sudo cp src-go/config.json.sample "${confpath}gatemaster.json"
+fi
+# Always replace the sample config file
+sudo cp src-go/config.json.sample "${confpath}gatemaster.json.sample"
 
-    # Install the service file
-    cp systemd/gatemaster.service "${servicefile}"
+# Install the service file
+sudo cp systemd/gatemaster.service "${servicefile}"
 
-    # Enable/restart the service
-    systemctl enable gatemaster
-    systemctl restart gatemaster
-}
+# Enable/restart the service
+sudo systemctl enable gatemaster
+sudo systemctl restart gatemaster
 
-# Now run all the operations that need to run with root permissions to install
-sudo bash -c "$(declare -f run_as_root); run_as_root"
+
