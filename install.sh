@@ -14,12 +14,12 @@ servicefile="/etc/systemd/system/gatemaster.service"
 ok=1
 for exe in go v4l2-ctl
 do
-  if [[ -f ${binpath}${exe} && -x ${binpath}${exe} ]] ; then
+  if [[ ! -f ${binpath}${exe} || ! -x ${binpath}${exe} ]] ; then
     echo "Missing Utility (${exe}): Please install it first"
     ok=2
   fi
 done
-if [ ok -eq 2 ] ; then
+if [ ${ok} -eq 2 ] ; then
   exit 1
 fi
 
