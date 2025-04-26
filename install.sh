@@ -24,7 +24,7 @@ if [ ${ok} -eq 2 ] ; then
 fi
 
 # Build the executable
-cd src-go && go get && go build -o gatemaster
+(cd src-go && go get && go build -o gatemaster)
 if [ $? -ne 0 ] ; then
   echo "Error building gatemaster executable"
   exit 1
