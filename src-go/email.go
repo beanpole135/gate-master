@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	gomail "gopkg.in/mail.v2"
 	"net/mail"
+
+	gomail "gopkg.in/mail.v2"
 )
 
 func isValidEmail(eml string) bool {
@@ -22,7 +23,7 @@ type Email struct {
 }
 
 func (E *Email) SendEmail(to string, subject string, body string, initialEmail bool) error {
-	if E.SmtpHost == "" || E.SmtpHost == "" || E.SmtpUsername == "" {
+	if E.SmtpHost == "" || E.SmtpPort == 0 || E.SmtpUsername == "" {
 		fmt.Println("Email system not configured")
 		return nil //do nothing - email system not setup
 	}

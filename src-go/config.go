@@ -23,7 +23,7 @@ type AuthConfig struct {
 func DefaultConfig() Config {
 	return Config{
 		Host:     "http://localhost:8080",
-		SiteName: "Shadow Mountain",
+		SiteName: "Gate Control",
 		DbFile:   "test.sqlite",
 		Auth: AuthConfig{
 			JwtSecret:    "testkey",

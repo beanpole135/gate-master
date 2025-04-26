@@ -53,7 +53,11 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	var err error
 	//Load the config file
-	CONFIG, err = LoadConfig("config.json")
+	conffile := "config.json"
+	if len(os.Args) > 1 {
+		conffile = os.Args[1]
+	}
+	CONFIG, err = LoadConfig(conffile)
 	if err != nil {
 		fmt.Println("Could not read config - using defaults:", err)
 	}
@@ -158,21 +162,23 @@ func returnSuccess(w http.ResponseWriter, msg string) {
 
 // Simple randomization functions
 const letterBytes = "abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789"
+
 func RandomString(length int) string {
-    b := make([]byte, length)
-    for i := range b {
-        b[i] = letterBytes[rand.Intn(len(letterBytes))]
-    }
-    fmt.Println("Generated Random String:", string(b))
-    return string(b)
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	fmt.Println("Generated Random String:", string(b))
+	return string(b)
 }
 
 const numberBytes = "0123456789"
+
 func RandomPIN(length int) string {
-    b := make([]byte, length)
-    for i := range b {
-        b[i] = numberBytes[rand.Intn(len(numberBytes))]
-    }
-    fmt.Println("Generated Random PIN:", string(b))
-    return string(b)
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = numberBytes[rand.Intn(len(numberBytes))]
+	}
+	fmt.Println("Generated Random PIN:", string(b))
+	return string(b)
 }
