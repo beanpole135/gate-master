@@ -1,0 +1,29 @@
+{
+    "host_url": "http://localhost:8080",
+    "site_name": "MySiteName",
+    "db_file": "/usr/local/share/gatemaster/db.sqlite",
+    "auth": {
+        "hash_key": "PickRandom32LettersHere",
+        "block_key": "PickRandom64LettersHere",
+        "jwtsecret": "AnotherRandomTextValueHere",
+        "jwttokenssecs": 3600
+    },
+    "email" : {
+        "smtp_host": "smtp.gmail.com",
+        "smtp_port": 587,
+        "smtp_user": "emailAddressHere",
+        "smtp_pass": "",
+        "sender_email": "emailAddressHere"
+    },
+    "keypad_pins" : {
+        "chipname": "",
+        "row1": 1,
+        "row2": 2,
+        "row3": 3,
+        "row4": 4,
+        "col1": 5,
+        "col2": 6,
+        "col3": 7
+    }
+
+}

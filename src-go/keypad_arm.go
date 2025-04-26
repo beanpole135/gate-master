@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/warthog618/go-gpiocdev"
 )
 
@@ -29,17 +30,17 @@ type Keypad struct {
 	C2       int    `json:"col2"`
 	C3       int    `json:"col3"`
 	// Internal variables
-	lines   []gpiocdev.Line `json:"-"`
-	pressed int             `json:"-"` //count of lines pressed right now
-	up      map[int]bool    `json:"-"`
+	lines   []*gpiocdev.Line `json:"-"`
+	pressed int              `json:"-"` //count of lines pressed right now
+	up      map[int]bool     `json:"-"`
 }
 
 func (K *Keypad) StartWatching() {
-	offsets = []int{K.R1, K.R2, K.R3, K.R4, K.C1, K.C2, K.C3}
+	offsets := []int{K.R1, K.R2, K.R3, K.R4, K.C1, K.C2, K.C3}
 	K.up = make(map[int]bool)
 	for _, offset := range offsets {
 		K.up[offset] = false
-		l, _ = gpiocdev.RequestLine(K.Chipname, offset, gpiocdev.WithEventHandler(K.handler), gpiocdev.WithBothEdges)
+		l, _ := gpiocdev.RequestLine(K.Chipname, offset, gpiocdev.WithEventHandler(K.handler), gpiocdev.WithBothEdges)
 		K.lines = append(K.lines, l)
 	}
 }
@@ -115,7 +116,7 @@ func (K *Keypad) handler(evt gpiocdev.LineEvent) {
 	}
 }
 
-func (K *Keypad) Pressed(offset int) {
+func (K *Keypad) Pressed(offset int) bool {
 	v, ok := K.up[offset]
 	if !ok || v == false {
 		return false
