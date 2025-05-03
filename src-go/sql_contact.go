@@ -125,7 +125,7 @@ func (D *Database) parseContactRows(rows *sql.Rows, with_picture bool) ([]Contac
 
 func (D *Database) ContactInsert(c *Contact) (*Contact, error) {
 	q := `insert into contact (account_id, email, phone_num, cell_type, is_primary, is_active, is_utility, is_delivery, is_contractor, is_mail, time_created, time_modified) values
-		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		returning contact_id;`
 	rslt, err := D.ExecSql(q, c.AccountID, c.Email, c.PhoneNum, c.CellType, c.IsPrimary, c.IsActive, c.IsUtility, c.IsDelivery, c.IsContractor, c.IsMail, D.TimeNow(), D.TimeNow())
 	if err != nil {
