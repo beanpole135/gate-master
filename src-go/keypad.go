@@ -1,8 +1,6 @@
-//go:build !arm
+//go:build !arm64
 
 package main
-
-import ()
 
 type Keypad struct{}
 
