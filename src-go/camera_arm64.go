@@ -33,11 +33,11 @@ func NewCamera(devName string) (*Camera, error) {
 		device.WithPixFormat(v4l2.PixFormat{PixelFormat: v4l2.PixelFmtMJPEG, Width: devWidth, Height: devHeight}),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("Could not open camera device: %w", err)
+		return &C, fmt.Errorf("Could not open camera device: %w", err)
 	}
 	err = C.CamDevice.Start(context.TODO())
 	if err != nil {
-		return nil, fmt.Errorf("Could not start camera: %w", err)
+		return &C, fmt.Errorf("Could not start camera: %w", err)
 	}
 	C.Frames = C.CamDevice.GetOutput()
 	fmt.Println("Initialized Camera")
