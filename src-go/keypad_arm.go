@@ -80,7 +80,7 @@ func (K *Keypad) NumPressed(num int) {
 		disp += "*"
 		n++
 	}
-	DisplayOnLCD(disp)
+	DisplayOnLCD(disp, 0)
 }
 
 func (K *Keypad) EnterPressed() {

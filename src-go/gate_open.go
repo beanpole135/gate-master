@@ -13,7 +13,7 @@ func CheckPINAndOpen(pin string) error {
 	// if ac==nil, invalid PIN
 	err = OpenGateAndNotify(nil, ac)
 	if ac == nil || err != nil {
-		return fmt.Errorf("Invalid Account Code")
+		return fmt.Errorf("Invalid PIN")
 	}
 	return nil
 }
@@ -68,6 +68,9 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	gl.GatePicture = CAM.TakePicture()
 
 	// Open the Gate
+	if gl.Success {
+		fmt.Println("[TODO] Opening Gate!!")
+	}
 
 	// Record the gate log
 	_, err := DB.GateLogInsert(&gl)
@@ -78,7 +81,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	if !gl.Success {
 		return fmt.Errorf("Unknown Gate Open Request - denied")
 	}
-	// Now send all the notification emails
+	// Now send all the notification emails for successes
 	for _, to := range emails {
 		CONFIG.Email.SendEmail(to, subject, msg, false)
 	}
