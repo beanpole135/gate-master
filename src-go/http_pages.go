@@ -391,6 +391,7 @@ func performAccountCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 	nacc, err := DB.AccountInsert(&acc)
 	if err != nil {
 		//Error
+		fmt.Println("Account Insert Error:", err)
 		returnError(w, "Internal error creating account")
 		return
 	}
@@ -403,6 +404,7 @@ func performAccountCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 	}
 	_, err = DB.ContactInsert(&ct)
 	if err != nil {
+		fmt.Println("Contact Insert Error:", err)
 		returnError(w, "Internal error creating account")
 		return
 	}
