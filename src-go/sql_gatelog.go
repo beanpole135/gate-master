@@ -76,7 +76,7 @@ func (D *Database) parseGatelogRows(rows *sql.Rows, with_picture bool) ([]GateLo
 
 func (D *Database) GateLogInsert(gl *GateLog) (*GateLog, error) {
 	q := `insert into gatelog (account_id, opened_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened, success) values
-		(?, ?, ?, ?, ?, ?, ?)
+		(?, ?, ?, ?, ?, ?, ?, ?)
 		returning log_id;`
 	rslt, err := D.ExecSql(q, gl.AccountID, gl.OpenedName, gl.UsedCode, gl.UsedWeb, gl.CodeTags, gl.GatePicture, D.TimeNow(), gl.Success)
 	if err != nil {
