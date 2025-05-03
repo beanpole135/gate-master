@@ -30,6 +30,10 @@
 	<input type="checkbox" id="isutility" name = "isutility" {{if  .Contact.IsUtility}}checked{{end}}>
 	<label for="isdelivery">Delivery Company</label>
 	<input type="checkbox" id="isdelivery" name = "isdelivery" {{if .Contact.IsDelivery}}checked{{end}}>
+	<label for="iscontractor">Contractor</label>
+	<input type="checkbox" id="iscontractor" name = "iscontractor" {{if  .Contact.IsContractor}}checked{{end}}>
+	<label for="ismail">Mail Service</label>
+	<input type="checkbox" id="ismail" name = "ismail" {{if  .Contact.IsMail}}checked{{end}}>
 	<label for="isprimary">Everything Else</label>
 	<input type="checkbox" id="isprimary" name = "isprimary" {{if .Contact.IsPrimary}}checked{{end}}>
 

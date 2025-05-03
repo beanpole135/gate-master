@@ -16,6 +16,10 @@
 	<input type="checkbox" id="isutility" name = "isutility" {{if .AccountCode.IsUtility}}checked{{end}}>
 	<label for="isdelivery">Is Delivery Company?</label>
 	<input type="checkbox" id="isdelivery" name = "isdelivery"{{if .AccountCode.IsDelivery}}checked{{end}}>
+	<label for="iscontractor">Is Contractor?</label>
+	<input type="checkbox" id="iscontractor" name = "iscontractor" {{if .AccountCode.IsContractor}}checked{{end}}>
+	<label for="ismail">Is Mail Service?</label>
+	<input type="checkbox" id="ismail" name = "ismail"{{if .AccountCode.IsMail}}checked{{end}}>
 	<label for="isprimary">Something Else</label>
 	<input type="checkbox" id="isprimary" name = "isprimary">
 

@@ -13,15 +13,25 @@ var s *securecookie.SecureCookie
 
 // Initialization function for the cookie system
 func setupSecureCookies() {
-	cookie_hashkey := []byte(CONFIG.Auth.HashKey) //32-64 characters recommended
+	cookie_hashkey := []byte(CONFIG.Auth.HashKey)   //32-64 characters recommended
 	cookie_blockkey := []byte(CONFIG.Auth.BlockKey) //Must be 32 characters long
+	updateConfig := false
 	if len(cookie_hashkey) == 0 {
 		cookie_hashkey = securecookie.GenerateRandomKey(32)
-		fmt.Println("Generated hashkey:", string(cookie_hashkey))
+		updateConfig = true
 	}
 	if len(cookie_blockkey) == 0 {
 		cookie_blockkey = securecookie.GenerateRandomKey(32)
-		fmt.Println("Generated blockkey:", string(cookie_blockkey))
+		updateConfig = true
+	}
+	if CONFIG.Auth.JwtSecret == "" {
+		CONFIG.Auth.JwtSecret = RandomString(32)
+		updateConfig = true
+	}
+	if updateConfig {
+		CONFIG.Auth.HashKey = string(cookie_hashkey)
+		CONFIG.Auth.BlockKey = string(cookie_blockkey)
+		UpdateConfig(CONFIG)
 	}
 	//Note: If random keys are used - then whenever the service is restarted
 	//  any clients currently going through the curity process will be rendered invalid

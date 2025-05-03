@@ -21,11 +21,13 @@ type AccountCode struct {
 	AccountCodeID int64
 	AccountID     int32
 	Code          string
-	CodeLength    int      //Not stored in database - temporary variable
+	CodeLength    int //Not stored in database - temporary variable
 	Label         string
 	IsActive      bool
 	IsUtility     bool
 	IsDelivery    bool
+	IsContractor  bool
+	IsMail        bool
 	DateStart     time.Time
 	DateEnd       time.Time
 	TimeStart     time.Time
@@ -51,6 +53,12 @@ func (A AccountCode) TagsString() string {
 	}
 	if A.IsDelivery {
 		tags = append(tags, "Delivery")
+	}
+	if A.IsContractor {
+		tags = append(tags, "Contractor")
+	}
+	if A.IsMail {
+		tags = append(tags, "Mail")
 	}
 	return strings.Join(tags, ", ")
 }
@@ -135,6 +143,8 @@ label text not null,
 is_active boolean default false,
 is_utility boolean default false,
 is_delivery boolean default false,
+is_contractor boolean default false,
+is_mail boolean default false,
 date_start integer,
 date_end integer,
 time_start integer,
@@ -158,7 +168,7 @@ func splitVDays(days string) []string {
 }
 
 // internal function to read the rows from the account_code table
-var accountCodeSelect = `select account_code_id, account_id, code, label, is_active, is_utility, is_delivery, date_start, date_end, time_start, time_end, valid_days, time_created, time_modified
+var accountCodeSelect = `select account_code_id, account_id, code, label, is_active, is_utility, is_delivery, is_contractor, is_mail, date_start, date_end, time_start, time_end, valid_days, time_created, time_modified
 	from account_code`
 
 func (D *Database) parseAccountCodeRows(rows *sql.Rows) ([]AccountCode, error) {
@@ -175,6 +185,8 @@ func (D *Database) parseAccountCodeRows(rows *sql.Rows) ([]AccountCode, error) {
 			&acc.IsActive,
 			&acc.IsUtility,
 			&acc.IsDelivery,
+			&acc.IsContractor,
+			&acc.IsMail,
 			&d_s,
 			&d_e,
 			&t_s,
@@ -204,6 +216,8 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		is_active,
 		is_utility,
 		is_delivery,
+		is_contractor,
+		is_mail,
 		date_start,
 		date_end,
 		time_start,
@@ -211,7 +225,7 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		valid_days,
 		time_created,
 		time_modified) values
-		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		returning account_code_id;`
 	rslt, err := D.ExecSql(q,
 		acc.AccountID,
@@ -220,6 +234,8 @@ func (D *Database) AccountCodeInsert(acc *AccountCode) (*AccountCode, error) {
 		acc.IsActive,
 		acc.IsUtility,
 		acc.IsDelivery,
+		acc.IsContractor,
+		acc.IsMail,
 		D.ToTime(acc.DateStart),
 		D.ToTime(acc.DateEnd),
 		D.ToTime(acc.TimeStart),
@@ -248,6 +264,8 @@ func (D *Database) AccountCodeUpdate(acc *AccountCode) (*AccountCode, error) {
 		is_active = ?,
 		is_utility = ?,
 		is_delivery = ?,
+		is_contractor = ?,
+		is_mail = ?,
 		date_start = ?,
 		date_end = ?,
 		time_start = ?,
@@ -262,6 +280,8 @@ func (D *Database) AccountCodeUpdate(acc *AccountCode) (*AccountCode, error) {
 		acc.IsActive,
 		acc.IsUtility,
 		acc.IsDelivery,
+		acc.IsContractor,
+		acc.IsMail,
 		D.ToTime(acc.DateStart),
 		D.ToTime(acc.DateEnd),
 		D.ToTime(acc.TimeStart),

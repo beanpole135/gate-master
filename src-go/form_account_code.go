@@ -17,6 +17,8 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	is_active := r.Form.Get("isactive") == formChecked
 	is_utility := r.Form.Get("isutility") == formChecked
 	is_delivery := r.Form.Get("isdelivery") == formChecked
+	is_contractor := r.Form.Get("iscontractor") == formChecked
+	is_mail := r.Form.Get("ismail") == formChecked
 	date_start := parseFormDate(r.Form.Get("dstart"))
 	date_end := parseFormDate(r.Form.Get("dend"))
 	time_start := parseFormTime(r.Form.Get("tstart"))
@@ -74,6 +76,8 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 	AC.IsActive = is_active
 	AC.IsUtility = is_utility
 	AC.IsDelivery = is_delivery
+	AC.IsContractor = is_contractor
+	AC.IsMail = is_mail
 	AC.ValidDays = []string{} //Reset and reload
 	if day_Su {
 		AC.ValidDays = append(AC.ValidDays, "su")

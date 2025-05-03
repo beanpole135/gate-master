@@ -10,12 +10,11 @@ type Camera struct {
 }
 
 const (
-	devName   = "/dev/video0"
 	devWidth  = 640
 	devHeight = 480
 )
 
-func NewCamera() (*Camera, error) {
+func NewCamera(devname string) (*Camera, error) {
 	C := Camera{}
 	//Template - for testing build on Windows only
 	return &C, nil

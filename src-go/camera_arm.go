@@ -3,8 +3,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 
 	"github.com/vladimirvivien/go4vl/device"
 	"github.com/vladimirvivien/go4vl/v4l2"
@@ -16,12 +20,11 @@ type Camera struct {
 }
 
 const (
-	devName   = "/dev/video0"
 	devWidth  = 640
 	devHeight = 480
 )
 
-func NewCamera() (*Camera, error) {
+func NewCamera(devName string) (*Camera, error) {
 	C := Camera{}
 	//Now initialize the camera
 	var err error
@@ -37,6 +40,7 @@ func NewCamera() (*Camera, error) {
 		return nil, fmt.Errorf("Could not start camera: %w", err)
 	}
 	C.Frames = C.CamDevice.GetOutput()
+	fmt.Println("Initialized Camera")
 	return &C, nil
 }
 
@@ -45,6 +49,7 @@ func (C *Camera) Close() {
 }
 
 func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
+	fmt.Println("Serving images")
 	mimeWriter := multipart.NewWriter(w)
 	w.Header().Set("Content-Type", fmt.Sprintf("multipart/x-mixed-replace; boundary=%s", mimeWriter.Boundary()))
 	partHeader := make(textproto.MIMEHeader)
@@ -66,7 +71,7 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 
 func (C *Camera) TakePicture() []byte {
 	// A single picture is just one frame from the current stream
-	for frame = range C.Frames {
+	for frame := range C.Frames {
 		return frame
 	}
 	return nil

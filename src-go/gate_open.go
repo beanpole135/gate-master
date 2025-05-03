@@ -20,7 +20,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 			contacts, err = DB.ContactsForAccountNotify(code.AccountID)
 		} else {
 			// Notify everyone listed for these types of entries
-			contacts, err = DB.ContactsForAllNotify(code.IsUtility, code.IsDelivery)
+			contacts, err = DB.ContactsForAllNotify(code.IsUtility, code.IsDelivery, code.IsContractor, code.IsMail)
 		}
 		if err != nil {
 			fmt.Println("Error reading Contacts:", err)

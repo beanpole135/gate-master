@@ -66,7 +66,7 @@ func main() {
 	exitErr(err, "Could not load Templates: %v")
 
 	//Setup the Camera
-	CAM, err = NewCamera()
+	CAM, err = NewCamera(CONFIG.CameraDevice)
 	exitErr(err, "Could not create Camera: %v")
 	defer CAM.Close()
 
