@@ -49,6 +49,9 @@ func (C *Camera) Close() {
 }
 
 func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
+	if C.Frames == nil {
+		return
+	}
 	fmt.Println("Serving images")
 	mimeWriter := multipart.NewWriter(w)
 	w.Header().Set("Content-Type", fmt.Sprintf("multipart/x-mixed-replace; boundary=%s", mimeWriter.Boundary()))
@@ -70,6 +73,9 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 }
 
 func (C *Camera) TakePicture() []byte {
+	if C.Frames == nil {
+		return []byte{}
+	}
 	// A single picture is just one frame from the current stream
 	for frame := range C.Frames {
 		return frame

@@ -67,7 +67,11 @@ func main() {
 
 	//Setup the Camera
 	CAM, err = NewCamera(CONFIG.CameraDevice)
-	exitErr(err, "Could not create Camera: %v")
+	if err != nil {
+		fmt.Println(err)
+	}
+	//exitErr(err, "Could not create Camera: %v")
+
 	defer CAM.Close()
 
 	//Setup the Database
