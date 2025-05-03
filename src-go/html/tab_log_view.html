@@ -2,9 +2,9 @@
 <button hx-post="/page-logs" hx-target="#logtab" hx-swap="outerHTML">Back to Logs</button>
 <form class="grid-form">
 	<h2 style="grid-column: 1 / span 2;">Gate Log Details</h2>
-	<label for="1">Opened By:</label>
-	<p id="1" name="1">{{.GateLog.OpenedName}}</p>
-	<label for="2">Date/Time Opened:</label>
+	<label for="1">Opened?:</label>
+	<p id="1" name="1">{{.GateLog.Success}}</p>
+	<label for="2">Date/Time:</label>
 	<p id="2" name = "2">{{.GateLog.TimeOpened.Format "Jan 02, 2006 3:04PM MST"}}</p>
 	<label for="3">Tags:</label>
 	<p id="3" name="3">{{.GateLog.CodeTags}}</p>

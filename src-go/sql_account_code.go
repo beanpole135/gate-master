@@ -333,7 +333,7 @@ func (D *Database) AccountCodeMatch(code string) (*AccountCode, error) {
 		return nil, err2
 	}
 	if len(accounts) != 1 {
-		return nil, fmt.Errorf("Invalid Account Code")
+		return nil, nil
 	}
 	//Got a valid account - return it
 	return &accounts[0], nil

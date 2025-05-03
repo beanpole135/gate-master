@@ -2,13 +2,15 @@
 	<h1>Gate Logs</h1>
 	<table>
 		<tr>
-			<th>Time Opened</th>
+			<th>Opened?</th>
+			<th>Time</th>
 			<th>Opened By</th>
 			<th>Method</th>
 			<th>Tags</th>
 		</tr>
 		{{range .GateLogs}}
 		<tr hx-post="/page-log-view" hx-vals='{"logid":"{{.LogID}}"}' hx-target="#page_logs" hx-swap="outerHTML">
+			<td>{{.Success}}</td>
 			<td>{{.TimeOpened.Format "Jan 02, 2006 3:04PM MST"}}</td>
 			<td>{{.OpenedName}}</td>
 			<td>{{.OpenedBy}}</td>

@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/warthog618/go-gpiocdev"
 )
@@ -19,6 +20,20 @@ Examples:
 R1 + C1 = Key "1"
 R2 + C3 = Key "6"
 */
+func DisplayOnLCD(text string, seconds int) {
+	fmt.Println("[TODO] Display on LCD:", text)
+	if seconds > 0 {
+		go ClearLCD(seconds)
+	}
+}
+
+func ClearLCD(seconds int) {
+	if seconds > 0 {
+		time.Sleep(time.Duration(seconds) * time.Second)
+	}
+	DisplayOnLCD("", 0)
+}
+
 type Keypad struct {
 	// Configuration from file
 	Chipname string `json:"chipname"`
@@ -30,9 +45,10 @@ type Keypad struct {
 	C2       int    `json:"col2"`
 	C3       int    `json:"col3"`
 	// Internal variables
-	lines   []*gpiocdev.Line `json:"-"`
-	pressed int              `json:"-"` //count of lines pressed right now
-	up      map[int]bool     `json:"-"`
+	lines     []*gpiocdev.Line `json:"-"`
+	pressed   int              `json:"-"` //count of lines pressed right now
+	up        map[int]bool     `json:"-"`
+	pin_cache string           `json:"-"` //current PIN code pending
 }
 
 func (K *Keypad) StartWatching() {
@@ -53,14 +69,36 @@ func (K *Keypad) Close() {
 
 func (K *Keypad) NumPressed(num int) {
 	fmt.Println("Number Pressed:", num)
+	K.pin_cache += fmt.Sprintf("%d", num)
+	if len(K.pin_cache) > 10 {
+		K.ClearPressed()
+		return
+	}
+	disp := ""
+	n := 0
+	for n < len(K.pin_cache) {
+		disp += "*"
+		n++
+	}
+	DisplayOnLCD(disp)
 }
 
 func (K *Keypad) EnterPressed() {
 	fmt.Println("Enter Pressed")
+	err := fmt.Errorf("PIN Needed")
+	if len(K.pin_cache) >= 4 {
+		err = CheckPINAndOpen(K.pin_cache)
+	}
+	K.pin_cache = ""
+	if err != nil {
+		DisplayOnLCD(err.Error(), 2)
+	}
 }
 
 func (K *Keypad) ClearPressed() {
 	fmt.Println("Clear Pressed")
+	K.pin_cache = ""
+	go ClearLCD(0)
 }
 
 func (K *Keypad) handler(evt gpiocdev.LineEvent) {

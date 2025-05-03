@@ -14,6 +14,7 @@ type GateLog struct {
 	CodeTags    string
 	GatePicture []byte
 	TimeOpened  time.Time
+	Success     bool
 }
 
 func (G GateLog) OpenedBy() string {
@@ -37,13 +38,14 @@ func (G GateLog) HasImage() bool {
 func (D *Database) CreateGateLogTable() error {
 	q := `create table if not exists gatelog (
 log_id integer primary key autoincrement,
-account_id integer not null,
-opened_name text not null,
+account_id integer,
+opened_name text,
 used_code text,
 used_web boolean,
 code_tags text,
 gate_picture_bytes blob,
-time_opened integer not null
+time_opened integer not null,
+success boolean
 	);`
 	_, err := D.ExecSql(q)
 	return err
@@ -58,11 +60,11 @@ func (D *Database) parseGatelogRows(rows *sql.Rows, with_picture bool) ([]GateLo
 		var gl GateLog
 		var err error
 		if with_picture {
-			if err = rows.Scan(&gl.LogID, &gl.AccountID, &gl.OpenedName, &gl.UsedCode, &gl.UsedWeb, &gl.CodeTags, &gl.GatePicture, &t_opened); err != nil {
+			if err = rows.Scan(&gl.LogID, &gl.AccountID, &gl.OpenedName, &gl.UsedCode, &gl.UsedWeb, &gl.CodeTags, &gl.GatePicture, &t_opened, &gl.Success); err != nil {
 				return list, err
 			}
 		} else {
-			if err = rows.Scan(&gl.LogID, &gl.AccountID, &gl.OpenedName, &gl.UsedCode, &gl.UsedWeb, &gl.CodeTags, &t_opened); err != nil {
+			if err = rows.Scan(&gl.LogID, &gl.AccountID, &gl.OpenedName, &gl.UsedCode, &gl.UsedWeb, &gl.CodeTags, &t_opened, &gl.Success); err != nil {
 				return list, err
 			}
 		}
@@ -73,10 +75,10 @@ func (D *Database) parseGatelogRows(rows *sql.Rows, with_picture bool) ([]GateLo
 }
 
 func (D *Database) GateLogInsert(gl *GateLog) (*GateLog, error) {
-	q := `insert into gatelog (account_id, opened_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened) values
+	q := `insert into gatelog (account_id, opened_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened, success) values
 		(?, ?, ?, ?, ?, ?, ?)
 		returning log_id;`
-	rslt, err := D.ExecSql(q, gl.AccountID, gl.OpenedName, gl.UsedCode, gl.UsedWeb, gl.CodeTags, gl.GatePicture, D.TimeNow())
+	rslt, err := D.ExecSql(q, gl.AccountID, gl.OpenedName, gl.UsedCode, gl.UsedWeb, gl.CodeTags, gl.GatePicture, D.TimeNow(), gl.Success)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +88,7 @@ func (D *Database) GateLogInsert(gl *GateLog) (*GateLog, error) {
 }
 
 func (D *Database) GatelogSelectAll() ([]GateLog, error) {
-	q := `select log_id, account_id, opened_name, used_code, used_web, code_tags, time_opened
+	q := `select log_id, account_id, opened_name, used_code, used_web, code_tags, time_opened, success
 	from gatelog order by time_opened desc limit 1000;`
 	rows, err := D.QuerySql(q)
 	if err != nil {
@@ -96,7 +98,7 @@ func (D *Database) GatelogSelectAll() ([]GateLog, error) {
 }
 
 func (D *Database) GateLogFromID(logId int64) (*GateLog, error) {
-	q := `select log_id, account_id, opened_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened
+	q := `select log_id, account_id, opened_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened, success
 	from gatelog where log_id = ?;`
 	rows, err := D.QuerySql(q, logId)
 	if err != nil {

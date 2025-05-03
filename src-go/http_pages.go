@@ -278,7 +278,7 @@ func performGateOpen(w http.ResponseWriter, r *http.Request, p *Page) {
 		handleError(w, r)
 		return
 	}
-	err = OpenGateAndNotify(acc, nil)
+	_ = OpenGateAndNotify(acc, nil)
 	returnSuccess(w, "Gate Opening!")
 }
 

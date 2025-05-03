@@ -2,7 +2,21 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
+
+func CheckPINAndOpen(pin string) error {
+	ac, err := DB.AccountCodeMatch(pin)
+	if err != nil {
+		return err
+	}
+	// if ac==nil, invalid PIN
+	err = OpenGateAndNotify(nil, ac)
+	if ac == nil || err != nil {
+		return fmt.Errorf("Invalid Account Code")
+	}
+	return nil
+}
 
 func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	// Now determine who to notify and send out notices
@@ -10,6 +24,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	msg := "%s is entering the neighborhood"
 	subject := fmt.Sprintf("%s Gate Notification", CONFIG.SiteName)
 	var gl GateLog
+	gl.TimeOpened = time.Now()
 	if code != nil {
 		msg = fmt.Sprintf(msg, code.Label)
 		var contacts []Contact
@@ -34,6 +49,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 		gl.OpenedName = code.Label
 		gl.UsedWeb = false
 		gl.UsedCode = code.Code
+		gl.Success = true
 
 	} else if acct != nil {
 		msg = fmt.Sprintf(msg, fmt.Sprintf("%s %s has opened the gate for somebody", acct.FirstName, acct.LastName))
@@ -41,9 +57,12 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 		gl.AccountID = acct.AccountID
 		gl.OpenedName = fmt.Sprintf("%s, %s", acct.LastName, acct.FirstName)
 		gl.UsedWeb = true
+		gl.Success = true
 	} else {
 		// Unknown who is opening the gate
-		return fmt.Errorf("Unknown Gate Open Request - denied")
+		gl.Success = false
+		gl.UsedWeb = false //if web is used, never get a failure/invalid
+		gl.OpenedName = "unknown"
 	}
 	// Snap a picture from the gate
 	gl.GatePicture = CAM.TakePicture()
@@ -56,6 +75,9 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 		fmt.Println("Error inserting GateLog:", err)
 	}
 
+	if !gl.Success {
+		return fmt.Errorf("Unknown Gate Open Request - denied")
+	}
 	// Now send all the notification emails
 	for _, to := range emails {
 		CONFIG.Email.SendEmail(to, subject, msg, false)
