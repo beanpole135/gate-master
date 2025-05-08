@@ -111,6 +111,7 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 		if _, err := partWriter.Write(frame); err != nil {
 			log.Printf("failed to write image: %s", err)
 		}
+		break
 	}
 }
 
