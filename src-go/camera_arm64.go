@@ -100,19 +100,24 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 	w.Header().Set("Content-Type", fmt.Sprintf("multipart/x-mixed-replace; boundary=%s", mimeWriter.Boundary()))
 	partHeader := make(textproto.MIMEHeader)
 	partHeader.Add("Content-Type", "image/jpeg")
-	//Create the writer
-	partWriter, err := mimeWriter.CreatePart(partHeader)
-	if err != nil {
-		log.Printf("failed to create multi-part writer: %s", err)
-		return
-	}
+
 	var frame []byte
 	for frame = range C.Frames {
+		if len(frame) == 0 {
+			continue //skip empty frame
+		}
+		//Create the writer
+		partWriter, err := mimeWriter.CreatePart(partHeader)
+		if err != nil {
+			log.Printf("failed to create multi-part writer: %s", err)
+			return
+		}
+		// Write the frame (image)
 		if _, err := partWriter.Write(frame); err != nil {
 			log.Printf("failed to write image: %s", err)
 			break
 		}
-		break //temporary to return only 1 frame (picture, not video) for now
+		//break //temporary to return only 1 frame (picture, not video) for now
 	}
 }
 
