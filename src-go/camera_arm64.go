@@ -24,8 +24,8 @@ type Camera struct {
 type CamConfig struct {
 	Device      string `json:"device"`
 	PixelFormat string `json:"pixel_format"`
-	Width       int    `json:"width"`
-	Height      int    `json:"height"`
+	Width       uint32 `json:"width"`
+	Height      uint32 `json:"height"`
 }
 
 func (cc *CamConfig) PixFmt() v4l2.FourCCType {
