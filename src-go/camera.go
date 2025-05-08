@@ -9,12 +9,14 @@ import (
 type Camera struct {
 }
 
-const (
-	devWidth  = 640
-	devHeight = 480
-)
+type CamConfig struct {
+	Device      string `json:"device"`
+	PixelFormat string `json:"pixel_format"`
+	Width       int    `json:"width"`
+	Height      int    `json:"height"`
+}
 
-func NewCamera(devname string) (*Camera, error) {
+func NewCamera(cc CamConfig) (*Camera, error) {
 	C := Camera{}
 	//Template - for testing build on Windows only
 	return &C, nil

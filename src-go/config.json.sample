@@ -1,11 +1,8 @@
 {
-    "host_url": "http://localhost:8080",
+    "host_url": "http://localhost:8081",
     "site_name": "MySiteName",
     "db_file": "/usr/local/share/gatemaster/db.sqlite",
     "auth": {
-        "hash_key": "PickRandom32LettersHere",
-        "block_key": "PickRandom64LettersHere",
-        "jwtsecret": "AnotherRandomTextValueHere",
         "jwttokenssecs": 3600
     },
     "email" : {
@@ -24,6 +21,12 @@
         "col1": 5,
         "col2": 6,
         "col3": 7
+    },
+    "camera" : {
+        "device": "/dev/video0",
+        "pixel_format": "h264",
+        "width": 1024,
+        "height": 768
     }
 
 }

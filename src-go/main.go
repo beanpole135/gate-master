@@ -66,7 +66,7 @@ func main() {
 	exitErr(err, "Could not load Templates: %v")
 
 	//Setup the Camera
-	CAM, err = NewCamera(CONFIG.CameraDevice)
+	CAM, err = NewCamera(CONFIG.Camera)
 	if err != nil {
 		fmt.Println(err)
 	}

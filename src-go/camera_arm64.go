@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"strings"
 
 	"github.com/vladimirvivien/go4vl/device"
 	"github.com/vladimirvivien/go4vl/v4l2"
@@ -17,6 +18,44 @@ import (
 type Camera struct {
 	Frames    <-chan []byte
 	CamDevice *device.Device
+	err       error
+}
+
+type CamConfig struct {
+	Device      string `json:"device"`
+	PixelFormat string `json:"pixel_format"`
+	Width       int    `json:"width"`
+	Height      int    `json:"height"`
+}
+
+func (cc *CamConfig) PixFmt() v4l2.FourCCType {
+	switch strings.ToLower(cc.PixelFormat) {
+	case "rgb24":
+		return v4l2.PixelFmtRGB24
+	case "grey":
+		return v4l2.PixelFmtGrey
+	case "yuyv":
+		return v4l2.PixelFmtYUYV
+	case "yyuv":
+		return v4l2.PixelFmtYYUV
+	case "yvyu":
+		return v4l2.PixelFmtYVYU
+	case "uyvy":
+		return v4l2.PixelFmtUYVY
+	case "vyuy":
+		return v4l2.PixelFmtVYUY
+	case "mjpeg":
+		return v4l2.PixelFmtMJPEG
+	case "jpeg":
+		return v4l2.PixelFmtJPEG
+	case "mpeg":
+		return v4l2.PixelFmtMPEG
+	case "h264":
+		return v4l2.PixelFmtH264
+	case "mpeg4":
+		return v4l2.PixelFmtMPEG4
+	}
+	return v4l2.PixelFmtH264
 }
 
 const (
@@ -24,19 +63,21 @@ const (
 	devHeight = 480
 )
 
-func NewCamera(devName string) (*Camera, error) {
+func NewCamera(cc CamConfig) (*Camera, error) {
 	C := Camera{}
 	//Now initialize the camera
 	var err error
 	C.CamDevice, err = device.Open(
-		devName,
-		device.WithPixFormat(v4l2.PixFormat{PixelFormat: v4l2.PixelFmtMJPEG, Width: devWidth, Height: devHeight}),
+		cc.Device,
+		device.WithPixFormat(v4l2.PixFormat{PixelFormat: cc.PixFmt(), Width: cc.Width, Height: cc.Height}),
 	)
 	if err != nil {
+		C.err = err
 		return &C, fmt.Errorf("Could not open camera device: %w", err)
 	}
 	err = C.CamDevice.Start(context.TODO())
 	if err != nil {
+		C.err = err
 		return &C, fmt.Errorf("Could not start camera: %w", err)
 	}
 	C.Frames = C.CamDevice.GetOutput()
@@ -49,7 +90,8 @@ func (C *Camera) Close() {
 }
 
 func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
-	if C.Frames == nil {
+	if C.Frames == nil || C.err != nil {
+		http.Error(w, C.err.Error(), http.StatusBadRequest)
 		return
 	}
 	fmt.Println("Serving images")
