@@ -81,8 +81,8 @@ label {
   color: rgba(0,0,0,0.65);
 }
 
-.gatecam {
-  max-height: 100%;
+#gatecam {
+  max-height: auto;
   max-width: 100%;
 }
 
