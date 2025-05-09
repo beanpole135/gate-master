@@ -7,14 +7,15 @@ import (
 )
 
 type Config struct {
-	filepath string     `json:"-"` //internal for where the file was loaded from
-	Host     string     `json:"host_url"`
-	SiteName string     `json:"site_name"`
-	DbFile   string     `json:"db_file"`
-	Auth     AuthConfig `json:"auth"`
-	Email    *Email     `json:"email"`
-	Keypad   *Keypad    `json:"keypad_pins"`
-	Camera   CamConfig  `json:"camera"`
+	filepath string      `json:"-"` //internal for where the file was loaded from
+	Host     string      `json:"host_url"`
+	SiteName string      `json:"site_name"`
+	DbFile   string      `json:"db_file"`
+	Auth     AuthConfig  `json:"auth"`
+	Email    *Email      `json:"email"`
+	Keypad   *Keypad     `json:"keypad_pins"`
+	Camera   CamConfig   `json:"camera"`
+	Gate     *GateConfig `json:"gate"`
 }
 type AuthConfig struct {
 	HashKey      string `json:"hash_key"`

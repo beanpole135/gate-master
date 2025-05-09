@@ -69,7 +69,8 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 
 	// Open the Gate
 	if gl.Success {
-		fmt.Println("[TODO] Opening Gate!!")
+		fmt.Println("Opening Gate!!")
+		CONFIG.Gate.OpenGate()
 	}
 
 	// Record the gate log
