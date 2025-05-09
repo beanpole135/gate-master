@@ -26,9 +26,8 @@ func (gc *GateConfig) OpenGate() (err error) {
 		}
 	}()
 
-	//Need to toggle the pin as an output first
-	rpio.PinMode(gc.GpioPin, rpio.Output)
 	pin := rpio.Pin(gc.GpioPin)
+	rpio.PinMode(pin, rpio.Output) //Need to toggle the pin as an output first
 	//Gate is triggered to open by a 1 second state change on the pin
 	pin.PullUp()
 	time.Sleep(time.Second) //wait one second
