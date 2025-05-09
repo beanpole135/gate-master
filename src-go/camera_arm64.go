@@ -5,7 +5,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -106,12 +105,12 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 		//Create the writer
 		partWriter, err := mimeWriter.CreatePart(partHeader)
 		if err != nil {
-			log.Printf("failed to create multi-part writer: %s", err)
+			fmt.Printf("failed to create multi-part writer: %s", err)
 			return
 		}
 		// Write the frame (image)
 		if _, err := partWriter.Write(frame); err != nil {
-			log.Printf("failed to write image: %s", err)
+			fmt.Printf("failed to write image: %s", err)
 			break
 		}
 		time.Sleep(20 * time.Millisecond) //20ms = 30 frames per second
