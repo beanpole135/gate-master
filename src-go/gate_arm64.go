@@ -19,9 +19,9 @@ func (gc *GateConfig) OpenGate() {
 		return
 	}
 	pin := rpio.Pin(gc.GpioPin)
-	//Gate is triggered to open by a 1 second "up" state on the pin
-	pin.PullUp()
+	//Gate is triggered to open by a 1 second state change on the pin
+	pin.Toggle()
 	time.Sleep(time.Second) //wait one second
-	pin.PullDown()
+	pin.Toggle()
 	rpio.Close()
 }
