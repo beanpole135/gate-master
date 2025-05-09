@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"os"
 	"strings"
 
 	"github.com/vladimirvivien/go4vl/device"
@@ -58,11 +59,6 @@ func (cc *CamConfig) PixFmt() v4l2.FourCCType {
 	return v4l2.PixelFmtH264
 }
 
-const (
-	devWidth  = 640
-	devHeight = 480
-)
-
 func NewCamera(cc CamConfig) (*Camera, error) {
 	C := Camera{}
 	//Now initialize the camera
@@ -82,6 +78,7 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 	}
 	C.Frames = C.CamDevice.GetOutput()
 	fmt.Println("Initialized Camera")
+	os.WriteFile("/usr/local/share/gatemaster/sample.png", C.TakePicture(), 0644)
 	return &C, nil
 }
 
