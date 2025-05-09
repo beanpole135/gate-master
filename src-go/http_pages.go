@@ -108,7 +108,7 @@ func performPWResetHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 	// Verify validity of account
 	acc, err := DB.AccountFromUser(user)
 	if err == nil && acc != nil {
-		newpw := RandomString(10)
+		newpw := RandomPIN(10)
 		acc.TempPwHash = hashPassword(newpw)
 		DB.AccountUpdate(acc)
 		// Now send an email to the user with the temporary password
@@ -359,7 +359,7 @@ func performAccountCreate(w http.ResponseWriter, r *http.Request, p *Page) {
 	uname := r.Form.Get("uname") //This is expected to be an email address
 	fname := r.Form.Get("fname")
 	lname := r.Form.Get("lname")
-	newpw := RandomString(10)
+	newpw := RandomPIN(10) //use numbers only - easier to read/change
 	//newpw2 := r.Form.Get("newpw2")
 	isadmin := r.Form.Get("isadmin") == formChecked
 	// Validate the inputs

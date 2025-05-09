@@ -165,7 +165,8 @@ func returnSuccess(w http.ResponseWriter, msg string) {
 }
 
 // Simple randomization functions
-const letterBytes = "abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789"
+// Note that "oOIj" are removed, since it is easy to mis-read them based on font
+const letterBytes = "abcdefghikmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789"
 
 func RandomString(length int) string {
 	b := make([]byte, length)
