@@ -9,8 +9,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"os"
 	"strings"
+	"time"
 
 	"github.com/vladimirvivien/go4vl/device"
 	"github.com/vladimirvivien/go4vl/v4l2"
@@ -56,7 +56,8 @@ func (cc *CamConfig) PixFmt() v4l2.FourCCType {
 	case "mpeg4":
 		return v4l2.PixelFmtMPEG4
 	}
-	return v4l2.PixelFmtH264
+	fmt.Println("Using MJPEG Camera Format by default")
+	return v4l2.PixelFmtMJPEG
 }
 
 func NewCamera(cc CamConfig) (*Camera, error) {
@@ -78,7 +79,6 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 	}
 	C.Frames = C.CamDevice.GetOutput()
 	fmt.Println("Initialized Camera")
-	os.WriteFile("/usr/local/share/gatemaster/sample.png", C.TakePicture(), 0644)
 	return &C, nil
 }
 
@@ -114,7 +114,7 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 			log.Printf("failed to write image: %s", err)
 			break
 		}
-		//break //temporary to return only 1 frame (picture, not video) for now
+		time.Sleep(20 * time.Millisecond) //20ms = 30 frames per second
 	}
 }
 

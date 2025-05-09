@@ -24,7 +24,7 @@
     },
     "camera" : {
         "device": "/dev/video0",
-        "pixel_format": "h264",
+        "pixel_format": "mjpeg",
         "width": 1024,
         "height": 768
     }

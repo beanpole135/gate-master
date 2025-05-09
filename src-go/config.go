@@ -41,7 +41,7 @@ func DefaultConfig() Config {
 		},
 		Camera: CamConfig{
 			Device:      "/dev/video0",
-			PixelFormat: "h264",
+			PixelFormat: "mjpeg",
 			Width:       1024,
 			Height:      768,
 		},
