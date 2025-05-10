@@ -82,7 +82,7 @@ func (K *Keypad) readLine(row uint32, vals []string) {
 	//Send a signal through the row
 	SetOutputDriveHigh(row)
 	//Check states of column inputs
-	diff := ReadPins(K.col_scan)
+	diff := ReadPins(K.col_scan, true) //Need hi/lo checks
 	for pin, state := range diff {
 		if state != PIN_UP {
 			continue

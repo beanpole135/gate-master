@@ -5,7 +5,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type PinState int
@@ -16,9 +15,9 @@ const (
 	PIN_DOWN
 )
 
-func ReadPins(list string) map[int]PinState {
+func ReadPins(list string, highlow bool) map[int]PinState {
 	// Input list: "1,2,4,6" or "1,4-8,20" (comma-separated and ranges, no spaces though)
-	//Line format: "<number>: ip    [pu|pd] | [hi|lo] // [Human-Readable name] = [input]"
+	//Line format: "<number>: [ip|op] [--] [pu|pd] | [hi|lo] // [Human-Readable name] = [input]"
 	// Example: "2: ip    pu | hi // GPIO2 = input"
 	out, err := exec.Command("pinctrl", "get", list).Output()
 	lines := strings.Split(string(out), "\n")
@@ -40,11 +39,29 @@ func ReadPins(list string) map[int]PinState {
 		if err != nil {
 			continue
 		}
-		switch words[2] {
-		case "pu":
-			state[pnum] = PIN_UP
-		case "pd":
-			state[pnum] = PIN_DOWN
+		if words[1] == "ip" {
+			if highlow {
+				switch words[4] {
+				case "hi":
+					state[pnum] = PIN_UP
+				case "lo":
+					state[pnum] = PIN_DOWN
+				}
+			} else {
+				switch words[2] {
+				case "pu":
+					state[pnum] = PIN_UP
+				case "pd":
+					state[pnum] = PIN_DOWN
+				}
+			}
+		} else if words[1] == "op" {
+			switch words[3] {
+			case "pu":
+				state[pnum] = PIN_UP
+			case "pd":
+				state[pnum] = PIN_DOWN
+			}
 		}
 	}
 	return state
@@ -108,7 +125,7 @@ func SetOutputDriveLow(pin uint32) error {
 }
 
 // Primary "scanning" function for watching for input events
-type EventHandler func(map[int]PinState)
+/*type EventHandler func(map[int]PinState)
 
 func ScanInputEvents(fn EventHandler) {
 	//Make sure you start this with "go ScanInputEvents(something)"
@@ -135,4 +152,4 @@ func ScanInputEvents(fn EventHandler) {
 		// Small pause to prevent overloading the system
 		time.Sleep(100 * time.Millisecond) //10 scans per second maximum
 	}
-}
+}*/
