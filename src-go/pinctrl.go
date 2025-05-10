@@ -5,7 +5,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type PinState int
@@ -56,12 +55,18 @@ func ReadAllPins() map[int]PinState {
 
 // Primary "set" functions
 func SetPinUp(pin uint32) error {
-	err := exec.Command(fmt.Sprintf("pinctrl set %d pu", pin)).Run()
+	err := exec.Command("pinctrl", "set", fmt.Sprintf("%d", pin), "pu").Run()
+	if err != nil {
+		fmt.Println("Got Error [SetPinUp]", err)
+	}
 	return err
 }
 
 func SetPinDown(pin uint32) error {
-	err := exec.Command(fmt.Sprintf("pinctrl set %d pd", pin)).Run()
+	err := exec.Command("pinctrl", "set", fmt.Sprintf("%d", pin), "pd").Run()
+	if err != nil {
+		fmt.Println("Got Error [SetPinUp]", err)
+	}
 	return err
 }
 
@@ -90,6 +95,6 @@ func ScanInputEvents(fn EventHandler) {
 		// Now replace the previous map with the now one and get ready for the next check
 		prev = now
 		// Small pause to prevent overloading the system
-		time.Sleep(100 * time.Millisecond) //10 scans per second maximum
+		//time.Sleep(100 * time.Millisecond) //10 scans per second maximum
 	}
 }
