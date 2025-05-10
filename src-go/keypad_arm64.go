@@ -126,7 +126,6 @@ func (K *Keypad) Close() {
 }
 
 func (K *Keypad) NumPressed(num string) {
-	fmt.Println("Number Pressed:", num)
 	K.pin_cache += num
 	if len(K.pin_cache) > 10 {
 		K.ClearPressed()
@@ -142,7 +141,6 @@ func (K *Keypad) NumPressed(num string) {
 }
 
 func (K *Keypad) EnterPressed() {
-	fmt.Println("Enter Pressed")
 	err := fmt.Errorf("PIN Needed")
 	if len(K.pin_cache) >= 4 {
 		err = CheckPINAndOpen(K.pin_cache)
@@ -154,7 +152,6 @@ func (K *Keypad) EnterPressed() {
 }
 
 func (K *Keypad) ClearPressed() {
-	fmt.Println("Clear Pressed")
 	K.pin_cache = ""
 	go ClearLCD(0)
 }

@@ -78,6 +78,11 @@ func main() {
 	exitErr(err, "Could not create database: %v")
 	defer DB.Close()
 
+	// Setup the Gate
+	err = CONFIG.Gate.SetupGate()
+	exitErr(err, "Could not setup Gate (check settings): %v")
+
+	// Setup the Keypad watcher
 	CONFIG.Keypad.StartWatching()
 	defer CONFIG.Keypad.Close()
 
