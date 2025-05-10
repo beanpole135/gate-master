@@ -43,7 +43,7 @@ type Keypad struct {
 	C2       int    `json:"col2"`
 	C3       int    `json:"col3"`
 	// Internal variables
-	pin_cache string           `json:"-"` //current PIN code pending
+	pin_cache string `json:"-"` //current PIN code pending
 }
 
 func (K *Keypad) StartWatching() {
@@ -52,7 +52,7 @@ func (K *Keypad) StartWatching() {
 
 func (K *Keypad) CheckEvents(diff map[int]PinState) {
 	if v, ok := diff[K.R1]; ok && v == PIN_UP {
-		if x, ok := diff[K.C1]; ok && v == PIN_UP {
+		if v, ok := diff[K.C1]; ok && v == PIN_UP {
 			K.NumPressed(1)
 		} else if v, ok := diff[K.C2]; ok && v == PIN_UP {
 			K.NumPressed(2)
