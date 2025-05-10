@@ -5,8 +5,6 @@ package main
 import (
 	"fmt"
 	"time"
-
-	"github.com/stianeikeland/go-rpio"
 )
 
 type GateConfig struct {
@@ -18,24 +16,14 @@ func (gc *GateConfig) OpenGate() (err error) {
 		fmt.Println("No Gate configured!!")
 		return fmt.Errorf("No Gate Configured")
 	}
-	//Setup crash handling for error detection. rpio library panics on errors
-	step := "Pin Create"
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Error opening gate:", step+":", r)
-			err = fmt.Errorf("Error opening gate")
-		}
-	}()
-
-	pin := rpio.Pin(gc.GpioPin)
-	step = "PinMode"
-	rpio.PinMode(pin, rpio.Input) //Need to ensure the pin is an input first (we input to the pin)
-	//Gate is triggered to open by a 1 second state change on the pin
-	step = "PullUp"
-	pin.PullUp()
+	err = SetPinUp(uint32(gc.GpioPin))
+	if err != nil {
+		return err
+	}
 	time.Sleep(time.Second) //wait one second
-	step = "PullDown"
-	pin.PullDown()
-	rpio.Close()
+	err = SetPinDown(uint32(gc.GpioPin))
+	if err != nil {
+		return err
+	}
 	return nil
 }

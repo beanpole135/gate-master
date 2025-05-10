@@ -71,7 +71,6 @@ func main() {
 		fmt.Println(err)
 	}
 	//exitErr(err, "Could not create Camera: %v")
-
 	defer CAM.Close()
 
 	//Setup the Database
@@ -80,6 +79,7 @@ func main() {
 	defer DB.Close()
 
 	CONFIG.Keypad.StartWatching()
+	defer CONFIG.Keypad.Close()
 
 	//Setup the HTTP auth system
 	setupSecureCookies()
