@@ -48,7 +48,18 @@ func DefaultConfig() Config {
 			Height:      768,
 		},
 		LCD: LCDConfig{
+			bus_num:        1,
 			backlight_secs: 10,
+			pins: I2CPins{
+				en:        6,
+				rw:        5,
+				rs:        4,
+				d4:        11,
+				d5:        12,
+				d6:        13,
+				d7:        14,
+				backlight: 3,
+			},
 		},
 	}
 }
