@@ -35,54 +35,79 @@ func ClearLCD(seconds int) {
 type Keypad struct {
 	// Configuration from file
 	Chipname string `json:"chipname"`
-	R1       int    `json:"row1"`
-	R2       int    `json:"row2"`
-	R3       int    `json:"row3"`
-	R4       int    `json:"row4"`
-	C1       int    `json:"col1"`
-	C2       int    `json:"col2"`
-	C3       int    `json:"col3"`
+	R1       uint32 `json:"row1"`
+	R2       uint32 `json:"row2"`
+	R3       uint32 `json:"row3"`
+	R4       uint32 `json:"row4"`
+	C1       uint32 `json:"col1"`
+	C2       uint32 `json:"col2"`
+	C3       uint32 `json:"col3"`
 	// Internal variables
 	pin_cache string `json:"-"` //current PIN code pending
+	col_scan  string `json:"-"` //quick scan string so we only assemble once
 }
 
 func (K *Keypad) StartWatching() {
-	go ScanInputEvents(K.CheckEvents)
+	// Rows are outputs and drivers
+	// Columns are inputs and what we watch for changes when checking a row
+	SetOutput(K.R1)
+	SetOutputDriveLow(K.R1)
+	SetOutput(K.R2)
+	SetOutputDriveLow(K.R2)
+	SetOutput(K.R3)
+	SetOutputDriveLow(K.R3)
+	SetOutput(K.R4)
+	SetOutputDriveLow(K.R4)
+	SetInput(K.C1)
+	SetPinDown(K.C1)
+	SetInput(K.C2)
+	SetPinDown(K.C2)
+	SetInput(K.C3)
+	SetPinDown(K.C3)
+	K.col_scan = fmt.Sprintf("%d,%d,%d", K.C1, K.C2, K.C3)
+	go K.watchKeys()
 }
 
-func (K *Keypad) CheckEvents(diff map[int]PinState) {
-	if v, ok := diff[K.R1]; ok && v == PIN_UP {
-		if v, ok := diff[K.C1]; ok && v == PIN_UP {
-			K.NumPressed(1)
-		} else if v, ok := diff[K.C2]; ok && v == PIN_UP {
-			K.NumPressed(2)
-		} else if v, ok := diff[K.C3]; ok && v == PIN_UP {
-			K.NumPressed(3)
+func (K *Keypad) watchKeys() {
+	for {
+		K.readLine(K.R1, []string{"1", "2", "3"})
+		K.readLine(K.R2, []string{"4", "5", "6"})
+		K.readLine(K.R3, []string{"7", "8", "9"})
+		K.readLine(K.R4, []string{"*", "0", "#"})
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func (K *Keypad) readLine(row uint32, vals []string) {
+	//Send a signal through the row
+	SetOutputDriveHigh(row)
+	//Check states of column inputs
+	diff := ReadPins(K.col_scan)
+	for pin, state := range diff {
+		if state != PIN_UP {
+			continue
 		}
-	} else if v, ok := diff[K.R2]; ok && v == PIN_UP {
-		if v, ok := diff[K.C1]; ok && v == PIN_UP {
-			K.NumPressed(4)
-		} else if v, ok := diff[K.C2]; ok && v == PIN_UP {
-			K.NumPressed(5)
-		} else if v, ok := diff[K.C3]; ok && v == PIN_UP {
-			K.NumPressed(6)
+		switch uint32(pin) {
+		case K.C1:
+			K.KeyPressed(vals[0])
+		case K.C2:
+			K.KeyPressed(vals[1])
+		case K.C3:
+			K.KeyPressed(vals[2])
 		}
-	} else if v, ok := diff[K.R3]; ok && v == PIN_UP {
-		if v, ok := diff[K.C1]; ok && v == PIN_UP {
-			K.NumPressed(7)
-		} else if v, ok := diff[K.C2]; ok && v == PIN_UP {
-			K.NumPressed(8)
-		} else if v, ok := diff[K.C3]; ok && v == PIN_UP {
-			K.NumPressed(9)
-		}
-	} else if v, ok := diff[K.R4]; ok && v == PIN_UP {
-		if v, ok := diff[K.C1]; ok && v == PIN_UP {
-			K.ClearPressed() // * key
-		} else if v, ok := diff[K.C2]; ok && v == PIN_UP {
-			K.NumPressed(1)
-		} else if v, ok := diff[K.C3]; ok && v == PIN_UP {
-			K.EnterPressed() // # key
-		}
+	}
+	//Turn off the signal in the row
+	SetOutputDriveLow(row)
+}
+
+func (K *Keypad) KeyPressed(key string) {
+	switch key {
+	case "*":
+		K.ClearPressed()
+	case "#":
+		K.EnterPressed()
+	default:
+		K.NumPressed(key)
 	}
 }
 
@@ -90,9 +115,9 @@ func (K *Keypad) Close() {
 
 }
 
-func (K *Keypad) NumPressed(num int) {
+func (K *Keypad) NumPressed(num string) {
 	fmt.Println("Number Pressed:", num)
-	K.pin_cache += fmt.Sprintf("%d", num)
+	K.pin_cache += num
 	if len(K.pin_cache) > 10 {
 		K.ClearPressed()
 		return
