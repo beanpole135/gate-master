@@ -82,6 +82,10 @@ func main() {
 	err = CONFIG.Gate.SetupGate()
 	exitErr(err, "Could not setup Gate (check settings): %v")
 
+	// Setup the LCD
+	err = CONFIG.LCD.Setup()
+	exitErr(err, "Could not setup I2C LCD (check settings): %v")
+
 	// Setup the Keypad watcher
 	CONFIG.Keypad.StartWatching()
 	defer CONFIG.Keypad.Close()
