@@ -43,8 +43,9 @@ type Keypad struct {
 	C2       uint32 `json:"col2"`
 	C3       uint32 `json:"col3"`
 	// Internal variables
-	pin_cache string `json:"-"` //current PIN code pending
-	col_scan  string `json:"-"` //quick scan string so we only assemble once
+	pin_cache string              `json:"-"` //current PIN code pending
+	col_scan  string              `json:"-"` //quick scan string so we only assemble once
+	key_state map[string]PinState `json:"-"` //so we can de-duplicate events
 }
 
 func (K *Keypad) StartWatching() {
@@ -65,6 +66,7 @@ func (K *Keypad) StartWatching() {
 	SetInput(K.C3)
 	SetPinDown(K.C3)
 	K.col_scan = fmt.Sprintf("%d,%d,%d", K.C1, K.C2, K.C3)
+	K.key_state = make(map[string]PinState)
 	go K.watchKeys()
 }
 
@@ -84,30 +86,38 @@ func (K *Keypad) readLine(row uint32, vals []string) {
 	//Check states of column inputs
 	diff := ReadPins(K.col_scan, true) //Need hi/lo checks
 	for pin, state := range diff {
-		if state != PIN_UP {
-			continue
-		}
 		switch uint32(pin) {
 		case K.C1:
-			K.KeyPressed(vals[0])
+			K.KeyPressed(vals[0], state)
 		case K.C2:
-			K.KeyPressed(vals[1])
+			K.KeyPressed(vals[1], state)
 		case K.C3:
-			K.KeyPressed(vals[2])
+			K.KeyPressed(vals[2], state)
 		}
 	}
 	//Turn off the signal in the row
 	SetOutputDriveLow(row)
 }
 
-func (K *Keypad) KeyPressed(key string) {
-	switch key {
-	case "*":
-		K.ClearPressed()
-	case "#":
-		K.EnterPressed()
-	default:
-		K.NumPressed(key)
+func (K *Keypad) KeyPressed(key string, stat PinState) {
+	// Need to de-duplicate current key states (UP = pressed, DOWN = not pressed)
+	cur, ok := K.key_state[key]
+	if !ok {
+		K.key_state[key] = stat //update cache
+	} else if cur != stat {
+		K.key_state[key] = stat //update cache
+		if stat == PIN_UP {
+			// Only trigger the routine the first time a key is pressed
+			// holding key down will not do anything else
+			switch key {
+			case "*":
+				K.ClearPressed()
+			case "#":
+				K.EnterPressed()
+			default:
+				K.NumPressed(key)
+			}
+		}
 	}
 }
 
