@@ -32,6 +32,9 @@ func ReadPins(list string) map[int]PinState {
 			continue //skip non-input pins
 		}
 		words := strings.Fields(line)
+		if len(words) < 3 {
+			continue
+		}
 		pin := strings.TrimSuffix(words[0], ":")
 		pnum, err := strconv.Atoi(pin)
 		if err != nil {
