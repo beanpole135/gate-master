@@ -16,6 +16,7 @@ type Config struct {
 	Keypad   *Keypad    `json:"keypad_pins"`
 	Camera   CamConfig  `json:"camera"`
 	Gate     GateConfig `json:"gate"`
+	LCD      LCDConfig  `json:"lcd_i2c"`
 }
 type AuthConfig struct {
 	HashKey      string `json:"hash_key"`
@@ -45,6 +46,9 @@ func DefaultConfig() Config {
 			PixelFormat: "mjpeg",
 			Width:       1024,
 			Height:      768,
+		},
+		LCD: LCDConfig{
+			backlight_secs: 10,
 		},
 	}
 }

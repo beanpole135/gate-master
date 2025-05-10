@@ -18,20 +18,6 @@ Examples:
 R1 + C1 = Key "1"
 R2 + C3 = Key "6"
 */
-func DisplayOnLCD(text string, seconds int) {
-	fmt.Println("[TODO] Display on LCD:", text)
-	if seconds > 0 {
-		go ClearLCD(seconds)
-	}
-}
-
-func ClearLCD(seconds int) {
-	if seconds > 0 {
-		time.Sleep(time.Duration(seconds) * time.Second)
-	}
-	DisplayOnLCD("", 0)
-}
-
 type Keypad struct {
 	// Configuration from file
 	Chipname string `json:"chipname"`
@@ -46,6 +32,7 @@ type Keypad struct {
 	pin_cache string              `json:"-"` //current PIN code pending
 	col_scan  string              `json:"-"` //quick scan string so we only assemble once
 	key_state map[string]PinState `json:"-"` //so we can de-duplicate events
+	cltimer   *time.Timer         `json:"-"`
 }
 
 func (K *Keypad) StartWatching() {
@@ -67,6 +54,14 @@ func (K *Keypad) StartWatching() {
 	SetPinDown(K.C3)
 	K.col_scan = fmt.Sprintf("%d,%d,%d", K.C1, K.C2, K.C3)
 	K.key_state = make(map[string]PinState)
+	K.cltimer = time.NewTimer(30 * time.Second)
+	go func() {
+		for {
+			<-K.cltimer.C
+			K.ClearPressed()
+		}
+	}()
+	K.cltimer.Stop() //no needed initially
 	go K.watchKeys()
 }
 
@@ -137,7 +132,7 @@ func (K *Keypad) NumPressed(num string) {
 		disp += "*"
 		n++
 	}
-	DisplayOnLCD(disp, 0)
+	K.DisplayOnLCD(disp, 30) //30s max before wiping the input
 }
 
 func (K *Keypad) EnterPressed() {
@@ -147,11 +142,18 @@ func (K *Keypad) EnterPressed() {
 	}
 	K.pin_cache = ""
 	if err != nil {
-		DisplayOnLCD(err.Error(), 2)
+		K.DisplayOnLCD(err.Error(), 2)
 	}
 }
 
 func (K *Keypad) ClearPressed() {
 	K.pin_cache = ""
-	go ClearLCD(0)
+	CONFIG.LCD.Clear()
+}
+
+func (K *Keypad) DisplayOnLCD(text string, seconds int) {
+	CONFIG.LCD.Display(text)
+	if seconds > 0 {
+		K.cltimer.Reset(time.Duration(seconds) * time.Second)
+	}
 }

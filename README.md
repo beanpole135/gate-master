@@ -31,3 +31,8 @@ Clone the repository onto the Pi itself, and then move into that directory and r
 * Git pull the source repo
 * Re-run the `install.sh` script. Will not overwrite your configuration file or database!
 * Compare your current configuration file to the sample one in `/usr/local/etc`. If there are new fields in the sample file, you may want to set those up in your primary config file and restart the service again.
+
+
+## Reference Material
+
+Fantastic guide on setting up an i2c LCD display [HERE](https://medium.com/@thedyslexiccoder/how-to-set-up-a-raspberry-pi-4-with-lcd-display-using-i2c-backpack-189a0760ae15). Include the configuration you need to do on the Raspberry Pi itself before you can configure this service and interact with the LCD screen.
