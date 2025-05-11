@@ -20,8 +20,8 @@ type Camera struct {
 	Frames <-chan []byte
 	//CamDevice *device.Device
 	err    error
-	webcam *gocv.Webcam
-	img    *gocv.NewMat
+	webcam *gocv.VideoCapture
+	img    *gocv.Mat
 }
 
 type CamConfig struct {
@@ -94,7 +94,7 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 		fmt.Println("Unable to open video capture device:", devnum)
 	}
 	C.img = gocv.NewMat()
-	C.Frames = make(<-chan []byte)
+	C.Frames = make(chan []byte)
 	go C.processVideo()
 	fmt.Println("Initialized Camera")
 	return &C, nil
@@ -122,6 +122,7 @@ func (C *Camera) processVideo() {
 }
 
 func (C *Camera) Close() {
+	C.img.Close()
 	//C.CamDevice.Close()
 }
 
