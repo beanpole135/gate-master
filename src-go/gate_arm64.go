@@ -10,6 +10,7 @@ import (
 
 type GateConfig struct {
 	GpioPin uint32     `json:"gpio_num"`
+	Invert  bool       `json:"invert_drive"`
 	locker  sync.Mutex `json:"-"`
 }
 
@@ -20,7 +21,7 @@ func (gc *GateConfig) SetupGate() error {
 	}
 	//Now set the Pin to the right settings
 	SetOutput(gc.GpioPin) //Set as output device
-	SetOutputDriveLow(gc.GpioPin)
+	gc.SetDrive(false)
 	return nil
 }
 
@@ -36,14 +37,25 @@ func (gc *GateConfig) OpenGate() (err error) {
 	}
 	defer gc.locker.Unlock()
 	// Turn it on for 1 second, then turn it back off again
-	err = SetOutputDriveHigh(gc.GpioPin)
+	err = gc.SetDrive(true)
 	if err != nil {
 		return err
 	}
 	time.Sleep(time.Second) //wait one second
-	err = SetOutputDriveLow(gc.GpioPin)
+	err = gc.SetDrive(false)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (gc *GateConfig) SetDrive(on bool) error {
+	if gc.Invert {
+		on = !on //reverse the order
+	}
+	if on {
+		return SetOutputDriveHigh(gc.GpioPin)
+	} else {
+		return SetOutputDriveLow(gc.GpioPin)
+	}
 }
