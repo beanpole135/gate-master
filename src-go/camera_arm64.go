@@ -17,11 +17,11 @@ import (
 )
 
 type Camera struct {
-	Frames <-chan []byte
+	Frames chan []byte
 	//CamDevice *device.Device
 	err    error
 	webcam *gocv.VideoCapture
-	img    *gocv.Mat
+	img    gocv.Mat
 }
 
 type CamConfig struct {

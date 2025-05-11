@@ -1,8 +1,6 @@
 module gate-master
 
-go 1.21
-
-toolchain go1.24.2
+go 1.19
 
 require (
 	github.com/davecheney/i2c v0.0.0-20140823063045-caf08501bef2
