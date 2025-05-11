@@ -3,22 +3,25 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/vladimirvivien/go4vl/device"
-	"github.com/vladimirvivien/go4vl/v4l2"
+	//"github.com/vladimirvivien/go4vl/device"
+	//"github.com/vladimirvivien/go4vl/v4l2"
+	"gocv.io/x/gocv"
 )
 
 type Camera struct {
-	Frames    <-chan []byte
-	CamDevice *device.Device
-	err       error
+	Frames <-chan []byte
+	//CamDevice *device.Device
+	err    error
+	webcam *gocv.Webcam
+	img    *gocv.NewMat
 }
 
 type CamConfig struct {
@@ -28,7 +31,7 @@ type CamConfig struct {
 	Height      uint32 `json:"height"`
 }
 
-func (cc *CamConfig) PixFmt() v4l2.FourCCType {
+/*func (cc *CamConfig) PixFmt() v4l2.FourCCType {
 	switch strings.ToLower(cc.PixelFormat) {
 	case "rgb24":
 		return v4l2.PixelFmtRGB24
@@ -57,12 +60,12 @@ func (cc *CamConfig) PixFmt() v4l2.FourCCType {
 	}
 	fmt.Println("Using MJPEG Camera Format by default")
 	return v4l2.PixelFmtMJPEG
-}
+}*/
 
 func NewCamera(cc CamConfig) (*Camera, error) {
 	C := Camera{}
 	//Now initialize the camera
-	var err error
+	/*var err error
 	C.CamDevice, err = device.Open(
 		cc.Device,
 		device.WithPixFormat(v4l2.PixFormat{PixelFormat: cc.PixFmt(), Width: cc.Width, Height: cc.Height}),
@@ -76,13 +79,50 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 		C.err = err
 		return &C, fmt.Errorf("Could not start camera: %w", err)
 	}
-	C.Frames = C.CamDevice.GetOutput()
+	C.Frames = C.CamDevice.GetOutput()*/
+
+	//Version using gocv (OpenCV)
+	dev := strings.TrimPrefix(cc.Device, "video")
+	devnum, err := strconv.Atoi(dev)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Unable to parse camera device (%s): using device number 0", cc.Device))
+		devnum = 0
+	}
+	C.webcam, err = gocv.OpenVideoCapture(devnum)
+	if err != nil {
+		C.err = err
+		fmt.Println("Unable to open video capture device:", devnum)
+	}
+	C.img = gocv.NewMat()
+	C.Frames = make(<-chan []byte)
+	go C.processVideo()
 	fmt.Println("Initialized Camera")
 	return &C, nil
 }
 
+func (C *Camera) processVideo() {
+	for {
+		if ok := C.webcam.Read(&C.img); ok {
+			fmt.Println("Cannot read video device - stopping")
+			return
+		}
+		if C.img.Empty() {
+			continue
+		}
+		//Perform processing as needed
+
+		//Now send to channel (as JPEG Image in bytes)
+		buffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, C.img, nil)
+		if err != nil {
+			fmt.Println("Could not encode image as JPEG:", err)
+			return
+		}
+		C.Frames <- buffer.GetBytes()
+	}
+}
+
 func (C *Camera) Close() {
-	C.CamDevice.Close()
+	//C.CamDevice.Close()
 }
 
 func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
