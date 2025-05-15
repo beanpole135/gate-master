@@ -9,3 +9,7 @@ type GateConfig struct {
 func (gc *GateConfig) OpenGate() {
 
 }
+
+func (gc *GateConfig) SetupGate() error {
+	return nil
+}

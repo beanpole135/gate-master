@@ -1,3 +1,5 @@
+github.com/cleroux/go-rpicamvid v0.0.0-20250515213103-bb4c7954c121 h1:l5o7jFGJr5xrb3WYh0HX4GtkUOkVhISUEfZ5qeUxSHo=
+github.com/cleroux/go-rpicamvid v0.0.0-20250515213103-bb4c7954c121/go.mod h1:R4E9Bnxippxz1xopwvOCO8/BlsdkhnZqW3sBPN5rT2Y=
 github.com/davecheney/i2c v0.0.0-20140823063045-caf08501bef2 h1:dJlrNN+WwRQae3jpM5U4K/YEug8H70UJ81qFTIW8OWw=
 github.com/davecheney/i2c v0.0.0-20140823063045-caf08501bef2/go.mod h1:dLsKZHRI/M1y9t45kzobSt8ozHf+wsCe+ahxsg51Vy0=
 github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=
@@ -8,8 +10,6 @@ github.com/gorilla/securecookie v1.1.2 h1:YCIWL56dvtr73r6715mJs5ZvhtnY73hBvEF8kX
 github.com/gorilla/securecookie v1.1.2/go.mod h1:NfCASbcHqRSY+3a8tlWJwsQap2VX5pwzwo4h3eOamfo=
 github.com/mattn/go-sqlite3 v1.14.24 h1:tpSp2G2KyMnnQu99ngJ47EIkWVmliIizyZBfPrBWDRM=
 github.com/mattn/go-sqlite3 v1.14.24/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
-gocv.io/x/gocv v0.41.0 h1:KM+zRXUP28b6dHfhy+4JxDODbCNQNtLg8kio+YE7TqA=
-gocv.io/x/gocv v0.41.0/go.mod h1:zYdWMj29WAEznM3Y8NsU3A0TRq/wR/cy75jeUypThqU=
 golang.org/x/crypto v0.31.0 h1:ihbySMvVjLAeSH1IbfcRTkD/iNscyz8rGzjF/E5hV6U=
 golang.org/x/crypto v0.31.0/go.mod h1:kDsLvtWBEx7MV9tJOj9bnXsPbxwJQ6csT/x4KIN4Ssk=
 gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc h1:2gGKlE2+asNV9m7xrywl36YYNnBG5ZQ0r/BOOxqPpmk=
