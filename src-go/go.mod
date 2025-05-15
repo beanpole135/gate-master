@@ -2,6 +2,7 @@ module gate-master
 
 go 1.19
 
+
 require (
 	github.com/cleroux/go-rpicamvid v0.0.0-20250515213103-bb4c7954c121
 	github.com/davecheney/i2c v0.0.0-20140823063045-caf08501bef2

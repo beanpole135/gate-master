@@ -4,12 +4,9 @@ package main
 
 import (
 	"fmt"
-	"mime/multipart"
+	"log"
 	"net/http"
-	"net/textproto"
-	"strconv"
-	"strings"
-	"time"
+	"os"
 
 	"github.com/cleroux/go-rpicamvid"
 )
@@ -44,27 +41,6 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 
 	return &C, err
 }
-
-/*func (C *Camera) processVideo() {
-	for {
-		if ok := C.webcam.Read(&C.img); ok {
-			fmt.Println("Cannot read video device - stopping")
-			return
-		}
-		if C.img.Empty() {
-			continue
-		}
-		//Perform processing as needed
-
-		//Now send to channel (as JPEG Image in bytes)
-		buffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, C.img, nil)
-		if err != nil {
-			fmt.Println("Could not encode image as JPEG:", err)
-			return
-		}
-		C.Frames <- buffer.GetBytes()
-	}
-}*/
 
 func (C *Camera) Close() {
 }
