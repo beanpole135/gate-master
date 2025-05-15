@@ -17,7 +17,7 @@ import (
 type Camera struct {
 	//CamDevice *device.Device
 	err    error
-	Webcam *rpicamvid.Rpicamvid
+	webcam *rpicamvid.Rpicamvid
 }
 
 type CamConfig struct {
@@ -33,7 +33,7 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 	l := log.New(os.StdOut, "", log.LstdFlags)
 	C.webcam = rpicamvid.New(l, cc.Width, cc.Height)
 	// Start it up and see if it is working (then close it down again)
-	stream, err = C.webcam.Start()
+	stream, err := C.webcam.Start()
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Unable to start camera service:", err))
 		C.err = err
@@ -45,7 +45,7 @@ func NewCamera(cc CamConfig) (*Camera, error) {
 	return &C, err
 }
 
-func (C *Camera) processVideo() {
+/*func (C *Camera) processVideo() {
 	for {
 		if ok := C.webcam.Read(&C.img); ok {
 			fmt.Println("Cannot read video device - stopping")
@@ -64,27 +64,25 @@ func (C *Camera) processVideo() {
 		}
 		C.Frames <- buffer.GetBytes()
 	}
-}
+}*/
 
 func (C *Camera) Close() {
-	C.img.Close()
-	//C.CamDevice.Close()
 }
 
 func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) {
-	if C.Webcam == nil || C.err != nil {
+	if C.webcam == nil || C.err != nil {
 		http.Error(w, C.err.Error(), http.StatusBadRequest)
 		return
 	}
-	C.Webcam.HttpHandler(w, req)
+	C.webcam.HttpHandler(w, req)
 }
 
 func (C *Camera) TakePicture() []byte {
-	if C.Webcam == nil || C.err != nil {
+	if C.webcam == nil || C.err != nil {
 		return []byte{}
 	}
 	// A single picture is just one frame from the current stream
-	stream, err := C.Webcam.Start()
+	stream, err := C.webcam.Start()
 	if err != nil {
 		fmt.Println("Unable to start camera:", err)
 		return []byte{}
