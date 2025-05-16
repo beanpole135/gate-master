@@ -18,10 +18,10 @@ type Camera struct {
 }
 
 type CamConfig struct {
-	//Device      string `json:"device"`
-	//PixelFormat string `json:"pixel_format"`
-	Width  uint32 `json:"width"`
-	Height uint32 `json:"height"`
+	Device      string `json:"device"`
+	PixelFormat string `json:"pixel_format"`
+	Width       int    `json:"width"`
+	Height      int    `json:"height"`
 }
 
 func NewCamera(cc CamConfig) (*Camera, error) {
@@ -50,7 +50,7 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 		http.Error(w, C.err.Error(), http.StatusBadRequest)
 		return
 	}
-	C.webcam.HttpHandler(w, req)
+	C.webcam.HTTPHandler(w, req)
 }
 
 func (C *Camera) TakePicture() []byte {
