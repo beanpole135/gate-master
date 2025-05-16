@@ -18,17 +18,20 @@ type Camera struct {
 }
 
 type CamConfig struct {
-	Device      string `json:"device"`
-	PixelFormat string `json:"pixel_format"`
-	Width       int    `json:"width"`
-	Height      int    `json:"height"`
+	Rotation int `json:"rotation"`
+	Width    int `json:"width"`
+	Height   int `json:"height"`
 }
 
 func NewCamera(cc CamConfig) (*Camera, error) {
 	C := Camera{}
 	// Now initialize the camera
-	l := log.New(os.StdOut, "", log.LstdFlags)
-	C.webcam = rpicamvid.New(l, cc.Width, cc.Height)
+	l := log.New(os.Stdout, "", log.LstdFlags)
+	var opts []string
+	if cc.Rotation != 0 {
+		opts = append(opts, "--rotation", fmt.Sprintf("%d", cc.Rotation))
+	}
+	C.webcam = rpicamvid.New(l, cc.Width, cc.Height, opts...)
 	// Start it up and see if it is working (then close it down again)
 	stream, err := C.webcam.Start()
 	if err != nil {

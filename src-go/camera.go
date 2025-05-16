@@ -10,10 +10,9 @@ type Camera struct {
 }
 
 type CamConfig struct {
-	Device      string `json:"device"`
-	PixelFormat string `json:"pixel_format"`
-	Width       int    `json:"width"`
-	Height      int    `json:"height"`
+	Rotation int `json:"rotation"`
+	Width    int `json:"width"`
+	Height   int `json:"height"`
 }
 
 func NewCamera(cc CamConfig) (*Camera, error) {

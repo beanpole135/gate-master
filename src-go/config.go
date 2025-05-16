@@ -42,10 +42,9 @@ func DefaultConfig() Config {
 			Sender:       "",
 		},
 		Camera: CamConfig{
-			Device:      "/dev/video0",
-			PixelFormat: "mjpeg",
-			Width:       1024,
-			Height:      768,
+			Rotation: 0,
+			Width:    1024,
+			Height:   768,
 		},
 		LCD: LCDConfig{
 			bus_num:        1,
