@@ -94,7 +94,6 @@ func (C *Camera) processImage(frame []byte) []byte {
 		img, _, err := image.Decode(bytes.NewReader(frame))
 		if err == nil {
 			img := imaging.Rotate90(img)
-			bytes.NewWriter
 			buf := new(bytes.Buffer)
 			err = jpeg.Encode(buf, img, nil)
 			if err != nil {
@@ -117,7 +116,7 @@ func (C *Camera) serveHttp(w http.ResponseWriter, req *http.Request) {
 	// Just so that we could inject the "processImage()" function above into it for additional 90-degree rotations
 	stream, err := C.webcam.Start()
 	if err != nil {
-		C.webcam.log.Printf("Failed to start camera: %v\n", err)
+		fmt.Println("Failed to start camera: %v\n", err)
 		http.Error(w, "Failed to start camera: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -141,14 +140,14 @@ func (C *Camera) serveHttp(w http.ResponseWriter, req *http.Request) {
 		err := func() error {
 			f, err := stream.GetFrame()
 			if err != nil {
-				C.webcam.log.Printf("Failed to get camera frame: %v\n", err)
+				fmt.Println("Failed to get camera frame: %v\n", err)
 				return nil // continue for loop
 			}
 			defer f.Close()
 
 			partWriter, err := mimeWriter.CreatePart(partHeader)
 			if err != nil {
-				C.webcam.log.Printf("Failed to create multi-part section: %v\n", err)
+				fmt.Println("Failed to create multi-part section: %v\n", err)
 				return err
 			}
 
@@ -163,7 +162,7 @@ func (C *Camera) serveHttp(w http.ResponseWriter, req *http.Request) {
 					// Client went away
 					return err
 				}
-				C.webcam.log.Printf("Failed to write video frame: %v\n", err)
+				fmt.Println("Failed to write video frame: %v\n", err)
 				return err
 			}
 			return nil
