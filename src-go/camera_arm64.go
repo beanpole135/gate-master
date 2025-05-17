@@ -66,7 +66,7 @@ func (C *Camera) ServeImages(w http.ResponseWriter, req *http.Request, p *Page) 
 		http.Error(w, C.err.Error(), http.StatusBadRequest)
 		return
 	}
-	C.webcam.HTTPHandler(w, req)
+	C.serveHttp(w, req)
 }
 
 func (C *Camera) TakePicture() []byte {
