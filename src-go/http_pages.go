@@ -175,9 +175,9 @@ func tab_accountcodesHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 func tab_accountcodesAllHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 	p.AccountCodes, _ = DB.AccountCodeSelectAll(0, 0) //all codes for all users
 	accounts, _ := DB.AccountsSelectAll()
-	idnamemap := make(map[int]string)
+	idnamemap := make(map[int32]string)
 	for _, acc := range accounts {
-		idnamemap[acc.ID] = fmt.Sprintf("%s, %s", acc.LastName, acc.FirstName)
+		idnamemap[acc.AccountID] = fmt.Sprintf("%s, %s", acc.LastName, acc.FirstName)
 	}
 	//Now update the "AccountName" field inside all the account codes so that we can display them
 	for _, ac := range p.AccountCodes {
