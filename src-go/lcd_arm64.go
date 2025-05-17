@@ -54,6 +54,7 @@ func (L *LCDConfig) Setup() (err error) {
 }
 
 func (L *LCDConfig) Display(text string) {
+	fmt.Println("Display on LCD:", text)
 	//Put the text on the screen
 	L.internal_lcd.Clear()
 	L.internal_lcd.SetPosition(1, 0) //line 1, character 0
@@ -65,5 +66,6 @@ func (L *LCDConfig) Display(text string) {
 }
 
 func (L *LCDConfig) Clear() {
+	fmt.Println("Clearing LCD")
 	L.internal_lcd.Clear()
 }
