@@ -58,8 +58,10 @@ func (L *LCDConfig) Display(text string) {
 	//Put the text on the screen
 	L.internal_lcd.Clear()
 	L.internal_lcd.SetPosition(1, 0) //line 1, character 0
-	//L.internal_lcd.Write([]byte(text))
-	fmt.Fprint(L.internal_lcd, text)
+	num, err := L.internal_lcd.Write([]byte(text))
+	if num < 1 || err != nil {
+		fmt.Println("Error writing to LCD: bytes written:", num, ", Error:", err)
+	}
 
 	//Turn on the backlight since something changed on the screen
 	L.internal_lcd.BacklightOn()
