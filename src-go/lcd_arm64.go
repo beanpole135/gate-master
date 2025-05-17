@@ -58,7 +58,8 @@ func (L *LCDConfig) Display(text string) {
 	//Put the text on the screen
 	L.internal_lcd.Clear()
 	L.internal_lcd.SetPosition(1, 0) //line 1, character 0
-	fmt.Fprintf(L.internal_lcd, text)
+	//L.internal_lcd.Write([]byte(text))
+	fmt.Fprint(L.internal_lcd, text)
 
 	//Turn on the backlight since something changed on the screen
 	L.internal_lcd.BacklightOn()
