@@ -37,6 +37,9 @@ type AccountCode struct {
 	//Internal audit fields
 	TimeCreated  time.Time
 	TimeModified time.Time
+
+	//Internal pass-through field (not stored in DB)
+	AccountName string
 }
 
 func (A AccountCode) Status() string {

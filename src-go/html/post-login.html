@@ -12,6 +12,7 @@
           {{if .Token.IsAdmin}}
           <hr>
           <button class="tabbutton" hx-post="/page-accounts" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-address-book-o"></i> Manage Accounts</button>
+          <button class="tabbutton" hx-post="/page-accountcodes-all" hx-target="#pagediv" hx-swap="innerHTML"><i class="fa fa-key"></i> Manage PIN Codes</button>
           {{end}}
           <hr>
           <button class="tabbutton" hx-post="/auth-logout"><i class="fa fa-sign-out"></i> Logout</button>

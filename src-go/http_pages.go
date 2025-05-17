@@ -28,6 +28,7 @@ func setupPages() {
 	http.HandleFunc("/account-update", checkToken(performAccountUpdate, true, true))
 	// AccountCodes Tab
 	http.HandleFunc("/page-accountcodes", checkToken(tab_accountcodesHandler, true, false))
+	http.HandleFunc("/page-accountcodes-all", checkToken(tab_accountcodesAllHandler, true, true))
 	http.HandleFunc("/page-accountcode-new", checkToken(tab_accountcodeNewHandler, true, false))
 	http.HandleFunc("/page-accountcode-view", checkToken(tab_accountcodeViewHandler, true, false))
 	http.HandleFunc("/accountcode-create", checkToken(performAccountcodeCreate, true, false))
@@ -171,6 +172,23 @@ func tab_accountcodesHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 	renderTemplate(w, "tab_accountcodes", p)
 }
 
+func tab_accountcodesAllHandler(w http.ResponseWriter, r *http.Request, p *Page) {
+	p.AccountCodes, _ = DB.AccountCodeSelectAll(0, 0) //all codes for all users
+	accounts, _ := DB.AccountsSelectAll()
+	idnamemap := make(map[int]string)
+	for _, acc := range accounts {
+		idnamemap[acc.ID] = fmt.Sprintf("%s, %s", acc.LastName, acc.FirstName)
+	}
+	//Now update the "AccountName" field inside all the account codes so that we can display them
+	for _, ac := range p.AccountCodes {
+		name, ok := idnamemap[ac.AccountID]
+		if ok {
+			ac.AccountName = name
+		}
+	}
+	renderTemplate(w, "tab_accountcodes_all", p)
+}
+
 func tab_accountcodeNewHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 	renderTemplate(w, "tab_accountcode_new", p)
 }
@@ -186,7 +204,11 @@ func tab_accountcodeViewHandler(w http.ResponseWriter, r *http.Request, p *Page)
 		return
 	}
 	// Load the accountcode from the DB
-	list, err := DB.AccountCodeSelectAll(p.Token.UserId, int64(id))
+	userid := p.Token.UserId
+	if p.Token.IsAdmin {
+		userid = 0 //disable the userID validation - admin can view all codes
+	}
+	list, err := DB.AccountCodeSelectAll(userid, int64(id))
 	if err != nil || len(list) < 1 {
 		//Invalid account ID
 		returnError(w, "Invalid Account Code")
