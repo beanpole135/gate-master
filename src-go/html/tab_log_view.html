@@ -11,8 +11,8 @@
 	<label for="4">Opened By:</label>
 	<p id="4" name="4">{{.GateLog.OpenedName}}</p>
 	{{if .GateLog.HasImage}}
-	<hr>
-	<img src="data:image/png;base64,{{.GateLog.ImageBase64}}">
+	<hr style="grid-column: 1 / span 2;">
+	<img style="grid-column: 1 / span 2;" id="gatecam" src="data:image/jpeg;base64,{{.GateLog.ImageBase64}}">
 	{{end}}
 </form>
 
