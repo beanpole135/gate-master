@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"time"
 )
 
@@ -33,6 +34,13 @@ func (G GateLog) ShowPIN(accid int32) string {
 
 func (G GateLog) HasImage() bool {
 	return len(G.GatePicture) > 0
+}
+
+func (G GateLog) ImageBase64() string {
+	if !G.HasImage() {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(G.GatePicture)
 }
 
 func (D *Database) CreateGateLogTable() error {
