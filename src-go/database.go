@@ -84,19 +84,19 @@ func (D *Database) PruneTables() {
 		ya := time.Now().AddDate(-YearsRetentionPolicy, 0, 0) //years ago
 		err := D.PruneGateLogs(ya)
 		if err != nil {
-			fmt.Println("Got error pruning GateLogs before %v: %v", ya, err)
+			fmt.Printf("Got error pruning GateLogs before %v: %v", ya, err)
 		}
 		err = D.PruneContacts(ya)
 		if err != nil {
-			fmt.Println("Got error pruning Contacts before %v: %v", ya, err)
+			fmt.Printf("Got error pruning Contacts before %v: %v", ya, err)
 		}
 		err = D.PruneAccountCodes(ya)
 		if err != nil {
-			fmt.Println("Got error pruning AccountCodes before %v: %v", ya, err)
+			fmt.Printf("Got error pruning AccountCodes before %v: %v", ya, err)
 		}
 		err = D.PruneAccounts(ya)
 		if err != nil {
-			fmt.Println("Got error pruning Accounts before %v: %v", ya, err)
+			fmt.Printf("Got error pruning Accounts before %v: %v", ya, err)
 		}
 	}
 }

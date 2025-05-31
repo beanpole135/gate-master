@@ -41,20 +41,20 @@ func LoadAccountCodeFromForm(r *http.Request) (AccountCode, error) {
 		}
 		list, err := DB.AccountCodeSelectAll(0, num)
 		if err != nil || len(list) != 1 {
-			return AC, fmt.Errorf("Invalid account code ID")
+			return AC, fmt.Errorf("invalid account code ID")
 		}
 		AC = list[0]
 	}
 	// Validate the inputs
 	if code == "" && AC.Code == "" && codelength == 0 {
-		return AC, fmt.Errorf("Missing PIN Code")
+		return AC, fmt.Errorf("missing PIN Code")
 	}
 	if code != "" && !validatePinCodeFormat(code) {
 		return AC, fmt.Errorf("PIN code must be 4 or more numbers")
 	}
 
 	if label == "" && AC.Label == "" {
-		return AC, fmt.Errorf("Missing Description")
+		return AC, fmt.Errorf("missing Description")
 	}
 	if time_start == nil {
 		tn := time.Now()

@@ -78,9 +78,10 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	if err != nil {
 		fmt.Println("Error inserting GateLog:", err)
 	}
+	go SaveCSVLog(gl, CONFIG.LogsDir)
 
 	if !gl.Success {
-		return fmt.Errorf("Unknown Gate Open Request - denied")
+		return fmt.Errorf("unknown gate open request - denied")
 	}
 	// Now send all the notification emails for successes
 	for _, to := range emails {

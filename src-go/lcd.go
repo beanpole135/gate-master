@@ -7,21 +7,22 @@ import (
 )
 
 type I2CPins struct {
-	en        uint8 `json:"en`
-	rw        uint8 `json:"rw`
-	rs        uint8 `json:"rs`
-	d4        uint8 `json:"d4`
-	d5        uint8 `json:"d5`
-	d6        uint8 `json:"d6`
-	d7        uint8 `json:"d7`
-	backlight uint8 `json:"backlight`
+	En        uint8 `json:"en"`
+	Rw        uint8 `json:"rw"`
+	Rs        uint8 `json:"rs"`
+	D4        uint8 `json:"d4"`
+	D5        uint8 `json:"d5"`
+	D6        uint8 `json:"d6"`
+	D7        uint8 `json:"d7"`
+	Backlight uint8 `json:"backlight"`
 }
 
 type LCDConfig struct {
 	//Config file variables
-	bus_num        int     `json:"i2c_bus_number"`
-	backlight_secs int     `json:"backlight_seconds"`
-	pins           I2CPins `json:"i2c_pins"`
+	Bus_num        int     `json:"i2c_bus_number"`
+	Backlight_secs int     `json:"backlight_seconds"`
+	Pins           I2CPins `json:"i2c_pins"`
+	Hex_addr       string  `json:"hex_address"`
 }
 
 func (L *LCDConfig) Setup() (err error) {

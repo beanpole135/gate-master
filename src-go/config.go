@@ -11,6 +11,7 @@ type Config struct {
 	Host     string     `json:"host_url"`
 	SiteName string     `json:"site_name"`
 	DbFile   string     `json:"db_file"`
+	LogsDir  string     `json:"logs_directory"`
 	Auth     AuthConfig `json:"auth"`
 	Email    *Email     `json:"email"`
 	Keypad   *Keypad    `json:"keypad_pins"`
@@ -30,6 +31,7 @@ func DefaultConfig() Config {
 		Host:     "http://localhost:8081",
 		SiteName: "Gate Control",
 		DbFile:   "test.sqlite",
+		LogsDir:  "",
 		Auth: AuthConfig{
 			JwtSecret:    "",
 			JwtTokenSecs: 3600,
@@ -47,17 +49,18 @@ func DefaultConfig() Config {
 			Height:   768,
 		},
 		LCD: LCDConfig{
-			bus_num:        1,
-			backlight_secs: 10,
-			pins: I2CPins{
-				en:        6,
-				rw:        5,
-				rs:        4,
-				d4:        11,
-				d5:        12,
-				d6:        13,
-				d7:        14,
-				backlight: 3,
+			Bus_num:        1,
+			Backlight_secs: 10,
+			Hex_addr:       "0x27",
+			Pins: I2CPins{
+				En:        6,
+				Rw:        5,
+				Rs:        4,
+				D4:        11,
+				D5:        12,
+				D6:        13,
+				D7:        14,
+				Backlight: 3,
 			},
 		},
 	}

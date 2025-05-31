@@ -162,7 +162,7 @@ func tab_accountViewHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 		return
 	}
 	// Load additional account info here
-	p.Contacts, err = DB.ContactsForAccount(int64(id))
+	p.Contacts, _ = DB.ContactsForAccount(int64(id))
 	// Now render the page
 	renderTemplate(w, "tab_account_view", p)
 }
@@ -228,7 +228,7 @@ func tab_profileHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 		return
 	}
 	// Load additional account info here
-	p.Contacts, err = DB.ContactsForAccount(int64(p.Token.UserId))
+	p.Contacts, _ = DB.ContactsForAccount(int64(p.Token.UserId))
 
 	// Now render the page
 	renderTemplate(w, "tab_profile", p)
@@ -356,7 +356,7 @@ func performProfilePWChange(w http.ResponseWriter, r *http.Request, p *Page) {
 		handleError(w, r)
 		return
 	}
-	acc2, err := DB.AccountForUsernamePassword(acc.Username, oldpw)
+	acc2, _ := DB.AccountForUsernamePassword(acc.Username, oldpw)
 	if acc.AccountID != acc2.AccountID {
 		//Error
 		returnError(w, "Incorrect Password")

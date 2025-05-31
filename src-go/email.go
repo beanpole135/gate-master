@@ -29,7 +29,7 @@ func (E *Email) SendEmail(to string, subject string, body string, initialEmail b
 	}
 	if !initialEmail && len(body) > 150 {
 		//Body of message too long
-		return fmt.Errorf("Body of email is too long. 150 character limit")
+		return fmt.Errorf("body of email is too long. 150 character limit")
 	}
 	// Create a new message
 	message := gomail.NewMessage()

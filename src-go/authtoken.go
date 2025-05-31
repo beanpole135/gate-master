@@ -63,7 +63,7 @@ func ReadSignedToken(tok string, jwtSecretKey string, checkTime bool) (AuthToken
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// First verify the signing algorithm is what you expect
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		// Now return the secret key for the signature for parsing/validation
 		return []byte(jwtSecretKey), nil

@@ -20,14 +20,13 @@ R2 + C3 = Key "6"
 */
 type Keypad struct {
 	// Configuration from file
-	Chipname string `json:"chipname"`
-	R1       uint32 `json:"row1"`
-	R2       uint32 `json:"row2"`
-	R3       uint32 `json:"row3"`
-	R4       uint32 `json:"row4"`
-	C1       uint32 `json:"col1"`
-	C2       uint32 `json:"col2"`
-	C3       uint32 `json:"col3"`
+	R1 uint32 `json:"row1"`
+	R2 uint32 `json:"row2"`
+	R3 uint32 `json:"row3"`
+	R4 uint32 `json:"row4"`
+	C1 uint32 `json:"col1"`
+	C2 uint32 `json:"col2"`
+	C3 uint32 `json:"col3"`
 	// Internal variables
 	pin_cache string              `json:"-"` //current PIN code pending
 	col_scan  string              `json:"-"` //quick scan string so we only assemble once

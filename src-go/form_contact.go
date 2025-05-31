@@ -31,7 +31,7 @@ func LoadContactFromForm(r *http.Request) (Contact, error) {
 			return AC, err
 		}
 	} else {
-		return AC, fmt.Errorf("Invalid Contact Type")
+		return AC, fmt.Errorf("invalid contact type")
 	}
 	if contactid != "" {
 		cid, err := strconv.ParseInt(contactid, 10, 32)

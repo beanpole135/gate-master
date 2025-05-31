@@ -4,27 +4,30 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/davecheney/i2c"
 )
 
 type I2CPins struct {
-	en        uint8 `json:"en`
-	rw        uint8 `json:"rw`
-	rs        uint8 `json:"rs`
-	d4        uint8 `json:"d4`
-	d5        uint8 `json:"d5`
-	d6        uint8 `json:"d6`
-	d7        uint8 `json:"d7`
-	backlight uint8 `json:"backlight`
+	En        uint8 `json:"en"`
+	Rw        uint8 `json:"rw"`
+	Rs        uint8 `json:"rs"`
+	D4        uint8 `json:"d4"`
+	D5        uint8 `json:"d5"`
+	D6        uint8 `json:"d6"`
+	D7        uint8 `json:"d7"`
+	Backlight uint8 `json:"backlight"`
 }
 
 type LCDConfig struct {
 	//Config file variables
-	bus_num        int     `json:"i2c_bus_number"`
-	backlight_secs int     `json:"backlight_seconds"`
-	pins           I2CPins `json:"i2c_pins"`
+	Bus_num        int     `json:"i2c_bus_number"`
+	Backlight_secs int     `json:"backlight_seconds"`
+	Pins           I2CPins `json:"i2c_pins"`
+	Hex_addr       string  `json:"hex_address"`
 	//Internal variables
 	internal_i2c *i2c.I2C    `json:"-"`
 	internal_lcd *i2c.Lcd    `json:"-"`
@@ -32,17 +35,21 @@ type LCDConfig struct {
 }
 
 func (L *LCDConfig) Setup() (err error) {
-	L.internal_i2c, err = i2c.New(0x27, L.bus_num)
+	haddr, err := strconv.ParseUint(strings.TrimPrefix(L.Hex_addr, "0x"), 16, 8)
+	if err != nil {
+		return err
+	}
+	L.internal_i2c, err = i2c.New(uint8(haddr), L.Bus_num)
 	if err != nil {
 		return err
 	}
 	//Config Pins input order: [en, rw, rs, d4, d5, d6, d7, backlight]
-	L.internal_lcd, err = i2c.NewLcd(L.internal_i2c, L.pins.en, L.pins.rw, L.pins.rs, L.pins.d4, L.pins.d5, L.pins.d6, L.pins.d7, L.pins.backlight)
-	//Put it in "standby" mode initially
+	L.internal_lcd, err = i2c.NewLcd(L.internal_i2c, L.Pins.En, L.Pins.Rw, L.Pins.Rs, L.Pins.D4, L.Pins.D5, L.Pins.D6, L.Pins.D7, L.Pins.Backlight)
+	//PutW it in "standby" mode initially
 	L.internal_lcd.Clear()
 	L.internal_lcd.BacklightOff()
 	//Setup the backlight timer to turn off after a period of seconds
-	L.bltimer = time.NewTimer(time.Duration(L.backlight_secs) * time.Second)
+	L.bltimer = time.NewTimer(time.Duration(L.Backlight_secs) * time.Second)
 	go func() {
 		for {
 			<-L.bltimer.C
@@ -65,7 +72,7 @@ func (L *LCDConfig) Display(text string) {
 
 	//Turn on the backlight since something changed on the screen
 	L.internal_lcd.BacklightOn()
-	L.bltimer.Reset(time.Duration(L.backlight_secs) * time.Second)
+	L.bltimer.Reset(time.Duration(L.Backlight_secs) * time.Second)
 }
 
 func (L *LCDConfig) Clear() {

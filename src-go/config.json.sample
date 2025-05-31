@@ -2,6 +2,7 @@
     "host_url": "http://localhost:8081",
     "site_name": "MySiteName",
     "db_file": "/usr/local/share/gatemaster/db.sqlite",
+    "logs_directory": "/var/log/gatemaster",
     "auth": {
         "jwttokenssecs": 3600
     },
@@ -13,7 +14,6 @@
         "sender_email": "emailAddressHere"
     },
     "keypad_pins" : {
-        "chipname": "",
         "row1": 1,
         "row2": 2,
         "row3": 3,
@@ -23,8 +23,7 @@
         "col3": 7
     },
     "camera" : {
-        "device": "/dev/video0",
-        "pixel_format": "mjpeg",
+        "rotation": 0,
         "width": 1024,
         "height": 768
     }
