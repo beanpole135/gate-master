@@ -38,4 +38,4 @@ Clone the repository onto the Pi itself, and then move into that directory and r
 Fantastic guide on setting up an i2c LCD display [HERE](https://medium.com/@thedyslexiccoder/how-to-set-up-a-raspberry-pi-4-with-lcd-display-using-i2c-backpack-189a0760ae15). Include the configuration you need to do on the Raspberry Pi itself before you can configure this service and interact with the LCD screen.
 
 ## Requirements
-* `libopencv` and `libopencv-dev` packages on the RPi
+

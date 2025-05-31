@@ -26,6 +26,25 @@
         "rotation": 0,
         "width": 1024,
         "height": 768
+    },
+    "gate" : {
+        "gpio_num" : 10,
+        "invert_drive" : false
+    },
+    "lcd_i2c" : {
+        "i2c_bus_number" : 1,
+        "hex_address" : "0x27",
+        "backlight_seconds" : 30,
+        "i2c_pins" : {
+            "en" : 8,
+            "rw" : 9,
+            "rs" : 10,
+            "d4" : 11,
+            "d5" : 12,
+            "d6" : 13,
+            "d7" : 14,
+            "backlight" : 15
+        }
     }
 
 }
