@@ -1,5 +1,5 @@
 {
-    "host_url": "http://localhost:8081",
+    "host_url": "http://localhost:8080",
     "site_name": "MySiteName",
     "db_file": "/usr/local/share/gatemaster/db.sqlite",
     "logs_directory": "/var/log/gatemaster",

@@ -104,8 +104,8 @@ func main() {
 	go DB.PruneTables() //Runs the pruning checks every day
 
 	http.HandleFunc("/", handleError)
-	fmt.Println("Listening on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("Listening on " + CONFIG.Host)
+	log.Fatal(http.ListenAndServe(CONFIG.Host, nil))
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {

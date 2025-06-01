@@ -38,6 +38,10 @@ func boolToString(b bool) string {
 
 // SaveLogEntry saves a log entry to a CSV file organized by Year/Month/Day.
 func SaveCSVLog(entry GateLog, basedir string) error {
+	if basedir == "" {
+		// Disabled in config file
+		return nil
+	}
 	// Get the current year, month, and day
 	year := strconv.Itoa(entry.TimeOpened.Year())
 	month := fmt.Sprintf("%2.f-", float32(entry.TimeOpened.Month())) + entry.TimeOpened.Month().String()

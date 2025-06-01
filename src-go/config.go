@@ -28,7 +28,7 @@ type AuthConfig struct {
 
 func DefaultConfig() Config {
 	return Config{
-		Host:     "http://localhost:8081",
+		Host:     ":8080",
 		SiteName: "Gate Control",
 		DbFile:   "test.sqlite",
 		LogsDir:  "",
