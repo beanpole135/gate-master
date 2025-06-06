@@ -31,9 +31,9 @@ type LCDConfig struct {
 	Pins           I2CPins `json:"i2c_pins"`
 	Hex_addr       string  `json:"hex_address"`
 	//Internal variables
-	internal_i2c *i2c.I2C    `json:"-"`
-	internal_lcd *i2c.Lcd    `json:"-"`
-	bltimer      *time.Timer `json:"-"`
+	internal_i2c *i2c.I2C     `json:"-"`
+	internal_lcd *hd44780.Lcd `json:"-"`
+	bltimer      *time.Timer  `json:"-"`
 }
 
 func (L *LCDConfig) Setup() (err error) {
