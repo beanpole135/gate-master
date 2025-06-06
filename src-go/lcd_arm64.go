@@ -4,11 +4,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/davecheney/i2c"
+	hd44780 "github.com/d2r2/go-hd44780"
+	i2c "github.com/d2r2/go-i2c"
 )
 
 type I2CPins struct {
@@ -39,13 +41,20 @@ func (L *LCDConfig) Setup() (err error) {
 	if err != nil {
 		return err
 	}
-	L.internal_i2c, err = i2c.New(uint8(haddr), L.Bus_num)
+	// Create a new I2C bus connection.
+	L.internal_i2c, err = i2c.NewI2C(uint8(haddr), L.Bus_num)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	//Config Pins input order: [en, rw, rs, d4, d5, d6, d7, backlight]
-	L.internal_lcd, err = i2c.NewLcd(L.internal_i2c, L.Pins.En, L.Pins.Rw, L.Pins.Rs, L.Pins.D4, L.Pins.D5, L.Pins.D6, L.Pins.D7, L.Pins.Backlight)
-	//PutW it in "standby" mode initially
+
+	// Create a new LCD instance.
+	// We specify the I2C connection, and the LCD's dimensions (16 columns, 2 rows).
+	L.internal_lcd, err = hd44780.NewLcd(L.internal_i2c, hd44780.LCD_16x2) // The library uses 16x2 for 1x16 displays as well.
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Put it in "standby" mode initially
 	L.internal_lcd.Clear()
 	L.internal_lcd.BacklightOff()
 	//Setup the backlight timer to turn off after a period of seconds
@@ -64,10 +73,9 @@ func (L *LCDConfig) Display(text string) {
 	fmt.Println("Display on LCD:", text)
 	//Put the text on the screen
 	L.internal_lcd.Clear()
-	L.internal_lcd.SetPosition(1, 0) //line 1, character 0
-	num, err := L.internal_lcd.Write([]byte(text))
-	if num < 1 || err != nil {
-		fmt.Println("Error writing to LCD: bytes written:", num, ", Error:", err)
+	err := L.internal_lcd.ShowMessage(text, hd44780.SHOW_LINE_1)
+	if err != nil {
+		fmt.Println("Error writing to LCD: bytes written:", err)
 	}
 
 	//Turn on the backlight since something changed on the screen
