@@ -135,16 +135,6 @@ Quick References:
         "i2c_bus_number" : 1,
         "hex_address" : "0x27",
         "backlight_seconds" : 30,
-        "i2c_pins" : {
-            "en" : 6,
-            "rw" : 5,
-            "rs" : 4,
-            "d4" : 11,
-            "d5" : 12,
-            "d6" : 13,
-            "d7" : 14,
-            "backlight" : 3
-        }
     }
 ```
 

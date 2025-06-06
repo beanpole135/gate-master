@@ -1,5 +1,5 @@
 {
-    "host_url": "http://localhost:8080",
+    "host_port": ":8080",
     "site_name": "MySiteName",
     "db_file": "/usr/local/share/gatemaster/db.sqlite",
     "logs_directory": "/var/log/gatemaster",
@@ -35,16 +35,6 @@
         "i2c_bus_number" : 1,
         "hex_address" : "0x27",
         "backlight_seconds" : 30,
-        "i2c_pins" : {
-            "en" : 8,
-            "rw" : 9,
-            "rs" : 10,
-            "d4" : 11,
-            "d5" : 12,
-            "d6" : 13,
-            "d7" : 14,
-            "backlight" : 15
-        }
     }
 
 }

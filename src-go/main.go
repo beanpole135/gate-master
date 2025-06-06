@@ -85,6 +85,7 @@ func main() {
 	// Setup the LCD
 	err = CONFIG.LCD.Setup()
 	exitErr(err, "Could not setup I2C LCD (check settings): %v")
+	defer CONFIG.LCD.Close()
 
 	// Setup the Keypad watcher
 	CONFIG.Keypad.StartWatching()
@@ -104,7 +105,7 @@ func main() {
 	go DB.PruneTables() //Runs the pruning checks every day
 
 	http.HandleFunc("/", handleError)
-	fmt.Println("Listening on " + CONFIG.Host)
+	fmt.Println("Listening on port" + CONFIG.Host)
 	log.Fatal(http.ListenAndServe(CONFIG.Host, nil))
 }
 

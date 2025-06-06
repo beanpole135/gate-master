@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	filepath string     `json:"-"` //internal for where the file was loaded from
-	Host     string     `json:"host_url"`
+	Host     string     `json:"host_port"`
 	SiteName string     `json:"site_name"`
 	DbFile   string     `json:"db_file"`
 	LogsDir  string     `json:"logs_directory"`
@@ -52,16 +52,6 @@ func DefaultConfig() Config {
 			Bus_num:        1,
 			Backlight_secs: 10,
 			Hex_addr:       "0x27",
-			Pins: I2CPins{
-				En:        6,
-				Rw:        5,
-				Rs:        4,
-				D4:        11,
-				D5:        12,
-				D6:        13,
-				D7:        14,
-				Backlight: 3,
-			},
 		},
 	}
 }

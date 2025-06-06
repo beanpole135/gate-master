@@ -13,23 +13,11 @@ import (
 	i2c "github.com/d2r2/go-i2c"
 )
 
-type I2CPins struct {
-	En        uint8 `json:"en"`
-	Rw        uint8 `json:"rw"`
-	Rs        uint8 `json:"rs"`
-	D4        uint8 `json:"d4"`
-	D5        uint8 `json:"d5"`
-	D6        uint8 `json:"d6"`
-	D7        uint8 `json:"d7"`
-	Backlight uint8 `json:"backlight"`
-}
-
 type LCDConfig struct {
 	//Config file variables
-	Bus_num        int     `json:"i2c_bus_number"`
-	Backlight_secs int     `json:"backlight_seconds"`
-	Pins           I2CPins `json:"i2c_pins"`
-	Hex_addr       string  `json:"hex_address"`
+	Bus_num        int    `json:"i2c_bus_number"`
+	Backlight_secs int    `json:"backlight_seconds"`
+	Hex_addr       string `json:"hex_address"`
 	//Internal variables
 	internal_i2c *i2c.I2C     `json:"-"`
 	internal_lcd *hd44780.Lcd `json:"-"`
@@ -70,7 +58,7 @@ func (L *LCDConfig) Setup() (err error) {
 }
 
 func (L *LCDConfig) Display(text string) {
-	fmt.Println("Display on LCD:", text)
+	//fmt.Println("Display on LCD:", text)
 	//Put the text on the screen
 	L.internal_lcd.Clear()
 	err := L.internal_lcd.ShowMessage(text, hd44780.SHOW_LINE_1)
@@ -84,6 +72,12 @@ func (L *LCDConfig) Display(text string) {
 }
 
 func (L *LCDConfig) Clear() {
-	fmt.Println("Clearing LCD")
+	//fmt.Println("Clearing LCD")
 	L.internal_lcd.Clear()
+}
+
+func (L *LCDConfig) Close() {
+	if L.internal_i2c != nil {
+		L.internal_i2c.Close()
+	}
 }
