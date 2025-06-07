@@ -8,7 +8,7 @@
 binpath="/usr/bin/"
 instpath="/usr/local/bin/"
 confpath="/usr/local/etc/"
-servicefile="/etc/systemd/system/gatemaster.service"
+servicedir="/etc/systemd/system/"
 
 # Check for package dependencies
 ok=1
@@ -49,8 +49,8 @@ fi
 sudo cp src-go/config.json.sample "${confpath}gatemaster.json.sample"
 
 # Install the service file
-sudo cp systemd/gatemaster.service "${servicefile}"
-sudo cp systemd/caddy.service "${servicefile}"
+sudo cp systemd/gatemaster.service "${servicedir}gatemaster.service"
+sudo cp systemd/caddy.service "${servicedir}caddy.service"
 
 # Enable/restart the service
 sudo systemctl enable gatemaster
