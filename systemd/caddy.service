@@ -1,0 +1,9 @@
+[Unit]
+Description=Caddy webservice
+
+[Service]
+ExecStart=/usr/bin/caddy run --config /usr/local/etc/Caddyfile
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

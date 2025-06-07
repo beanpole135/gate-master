@@ -42,11 +42,15 @@ fi
 if [ ! -f "${confpath}gatemaster.json" ] ; then
     sudo cp src-go/config.json.sample "${confpath}gatemaster.json"
 fi
+if [ ! -f "${confpath}Caddyfile" ] ; then
+    sudo cp systemd/Caddyfile.sample "${confpath}Caddyfile"
+fi
 # Always replace the sample config file
 sudo cp src-go/config.json.sample "${confpath}gatemaster.json.sample"
 
 # Install the service file
 sudo cp systemd/gatemaster.service "${servicefile}"
+sudo cp systemd/caddy.service "${servicefile}"
 
 # Enable/restart the service
 sudo systemctl enable gatemaster
