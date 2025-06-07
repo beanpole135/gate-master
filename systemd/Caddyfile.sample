@@ -1,6 +1,8 @@
 # Basic reverse proxy to a local service
-# Just change the ":8080" declaration to something like "localhost" or "www.mywebsite.com"
+# Just change the ":8080" declaration to something like "localhost" or "example.com"
 # when you want to hook up to global DNS
+# Caddy DNS setup guide: https://caddyserver.com/docs/quick-starts/https
+
 :8080 {
     reverse_proxy 127.0.0.1:8080
 }
