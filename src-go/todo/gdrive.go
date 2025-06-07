@@ -1,6 +1,4 @@
-none
-
-package p /*
+/*
 package main
 
 import (
