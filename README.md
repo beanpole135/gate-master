@@ -86,12 +86,20 @@ On the Pi, open up a terminal and run the following commands one at a time:
 5. `bash install.sh` (Build and install gate-master)
    - This step will take a while the first time you run it on a new system!! Go get some coffee or somthing and just wait until it prints out that the gate-master service is now running!
 
+The Gate-master installation script will also setup the files to run a "Caddy" webserver instance with a sample configuration for you to finish editing. You need to install the `caddy` package first, before you can use these steps to finish it up:
+
+1. `sudo nano /usr/local/etc/Caddyfile` to edit the configuration for Caddy
+2. `sudo systemctl enable caddy` to have the system automatically start the Caddy service on system bootup
+3. `sudo systemctl [start|stop|restart] caddy` to manually manage the service
+4. `journalctl -u caddy` to look at the system logs for the service
+
+
 #### Configuring Gate-master
 Before it will really "work", you need to update the configuration file for the service based upon how you have everything setup on the Pi itself.
 
 Top-level configuration parameters and explanations
 
-* "host_url" : This is the local address to have the service listen on. 
+* "host_port" : This is the local port to have the service listen on (prefixed by a colon ":"). 
   * Typically you will just point this to some random port number like ":8080", and then setup Caddy to handle your SSL certificates and reverse-proxy over to that local port based upon your domain (in case you have multiple web services running on the same system)
 * "site_name" : This is just the display name that you want to show at the top of the login page for the web interface.
   * Example: "Welcome to [Your site_name here]"

@@ -108,7 +108,7 @@ func performPWResetHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 
 	// Verify validity of account
 	acc, err := DB.AccountFromUser(user)
-	if err == nil && acc != nil {
+	if err == nil && acc != nil && acc.AccountStatus != Account_Inactive {
 		newpw := RandomPIN(10)
 		acc.TempPwHash = hashPassword(newpw)
 		DB.AccountUpdate(acc)

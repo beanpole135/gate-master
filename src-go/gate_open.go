@@ -71,6 +71,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	if gl.Success {
 		fmt.Println("Opening Gate!!")
 		CONFIG.Gate.OpenGate()
+		CONFIG.Keypad.DisplayOnLCD("Welcome!", 2)
 	}
 
 	// Record the gate log

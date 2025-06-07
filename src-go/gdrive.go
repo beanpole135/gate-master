@@ -1,5 +1,6 @@
-//go:build none
+none
 
+package p /*
 package main
 
 import (
@@ -262,6 +263,7 @@ func uploadFileToPath(config *GDriveConfig, filePath string, drivePath string) (
 	// Upload the file to the resolved folder
 	return uploadFile(config, filePath, folderId)
 }
+*/
 
 /* Example main function
 func main() {

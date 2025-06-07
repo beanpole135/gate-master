@@ -137,6 +137,10 @@ func (AC *AccountCode) IsValid() bool {
 	return true //All validity checks passed
 }
 
+func (AC AccountCode) IsOther() bool {
+	return !(AC.IsUtility || AC.IsDelivery || AC.IsContractor || AC.IsMail)
+}
+
 func (D *Database) CreateACTable() error {
 	q := `create table if not exists account_code (
 account_code_id integer primary key autoincrement,

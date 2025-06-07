@@ -11,3 +11,7 @@ func (K *Keypad) StartWatching() {
 func (K *Keypad) Close() {
 
 }
+
+func (K *Keypad) DisplayOnLCD(text string, seconds int) {
+
+}

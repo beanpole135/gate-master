@@ -11,17 +11,19 @@
 	<input type="checkbox" id="isactive" name = "isactive" {{if .AccountCode.IsActive}}checked{{end}}>
 	<hr style="grid-column: 1 / span 2;">
 	<h2 style="grid-column: 1 / span 2;">Notification Tag</h2>
-	<p style="grid-column: 1 / span 2;">Pick one of these to indicate which type of access this code indicates.</p>
+	<p style="grid-column: 1 / span 2;">Pick <u>ONE</u> of these to indicate which type of access this code indicates.</p>
+	{{if .Token.IsAdmin}}
 	<label for="isutility">Is Utility Company?</label>
 	<input type="checkbox" id="isutility" name = "isutility" {{if .AccountCode.IsUtility}}checked{{end}}>
 	<label for="isdelivery">Is Delivery Company?</label>
 	<input type="checkbox" id="isdelivery" name = "isdelivery"{{if .AccountCode.IsDelivery}}checked{{end}}>
-	<label for="iscontractor">Is Contractor?</label>
-	<input type="checkbox" id="iscontractor" name = "iscontractor" {{if .AccountCode.IsContractor}}checked{{end}}>
 	<label for="ismail">Is Mail Service?</label>
 	<input type="checkbox" id="ismail" name = "ismail"{{if .AccountCode.IsMail}}checked{{end}}>
+	{{end}}
+	<label for="iscontractor">Is Contractor?</label>
+	<input type="checkbox" id="iscontractor" name = "iscontractor" {{if .AccountCode.IsContractor}}checked{{end}}>
 	<label for="isprimary">Something Else</label>
-	<input type="checkbox" id="isprimary" name = "isprimary">
+	<input type="checkbox" id="isprimary" name = "isprimary" {{if .AccountCode.IsOther}}checked{{end}}>
 
 	<hr style="grid-column: 1 / span 2;">
 	<h2 style="grid-column: 1 / span 2;">Date/Time Restrictions (optional)</h2>

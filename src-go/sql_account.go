@@ -173,7 +173,7 @@ func (D *Database) AccountUpdate(acc *Account) (*Account, error) {
 		time_modified = ?
 		where account_id = ?;`
 		_, err = D.ExecSql(q, acc.FirstName, acc.LastName, strings.ToLower(acc.Username), acc.PwHash, acc.AccountStatus, D.TimeNow(), acc.AccountID)
-	
+
 	} else if acc.TempPwHash != "" {
 		// Adding a temporary password (do not change current password hash!)
 		q := `update account set 
@@ -272,6 +272,10 @@ func (D *Database) AccountForUsernamePassword(u string, passw string) (*Account,
 	}
 	if len(accounts) != 1 {
 		return nil, fmt.Errorf("Invalid Username/Password: %v", accounts)
+	}
+	//Verify the account is active
+	if accounts[0].AccountStatus == Account_Inactive {
+		return nil, fmt.Errorf("Invalid Account Status")
 	}
 	//Now validate the password hash
 	err = accounts[0].validatePassword(passw)
