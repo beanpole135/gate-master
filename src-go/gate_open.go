@@ -52,7 +52,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 		gl.Success = true
 
 	} else if acct != nil {
-		msg = fmt.Sprintf(msg, fmt.Sprintf("%s %s has opened the gate for somebody", acct.FirstName, acct.LastName))
+		msg = fmt.Sprintf(msg, fmt.Sprintf("%s %s has opened the gate.", acct.FirstName, acct.LastName))
 		//Web Portal used - no need to notify anyone?
 		gl.AccountID = acct.AccountID
 		gl.OpenedName = fmt.Sprintf("%s, %s", acct.LastName, acct.FirstName)
@@ -85,6 +85,7 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 		return fmt.Errorf("unknown gate open request - denied")
 	}
 	// Now send all the notification emails for successes
+	msg = fmt.Sprintf("[%s] ", time.Now().Format("Jan _2: 03:04 MST")) + msg
 	for _, to := range emails {
 		CONFIG.Email.SendEmail(to, subject, msg, false)
 	}
