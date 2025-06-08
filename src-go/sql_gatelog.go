@@ -105,6 +105,16 @@ func (D *Database) GatelogSelectAll() ([]GateLog, error) {
 	return D.parseGatelogRows(rows, false)
 }
 
+func (D *Database) GatelogSelectAccount(account int32) ([]GateLog, error) {
+	q := `select log_id, account_id, opened_name, used_code, used_web, code_tags, time_opened, success
+	from gatelog where account_id = ? order by time_opened desc limit 1000;`
+	rows, err := D.QuerySql(q, account)
+	if err != nil {
+		return nil, err
+	}
+	return D.parseGatelogRows(rows, false)
+}
+
 func (D *Database) GateLogFromID(logId int64) (*GateLog, error) {
 	q := `select log_id, account_id, opened_name, used_code, used_web, code_tags, gate_picture_bytes, time_opened, success
 	from gatelog where log_id = ?;`

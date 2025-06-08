@@ -235,7 +235,11 @@ func tab_profileHandler(w http.ResponseWriter, r *http.Request, p *Page) {
 }
 
 func tab_logsHandler(w http.ResponseWriter, r *http.Request, p *Page) {
-	p.GateLogs, _ = DB.GatelogSelectAll()
+	if p.Token.IsAdmin {
+		p.GateLogs, _ = DB.GatelogSelectAll()
+	} else {
+		p.GateLogs, _ = DB.GatelogSelectAccount(p.Token.UserId)
+	}
 	renderTemplate(w, "tab_logs", p)
 }
 
