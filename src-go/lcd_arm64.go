@@ -33,9 +33,11 @@ func (L *LCDConfig) Setup() (err error) {
 	i_lcd, i_i2c, err := L.initLCD()
 	if err != nil {
 		fmt.Println("I2C LCD not configured correctly:", err)
+		L.lcd_enabled = false
 		return err
 	}
 	defer i_i2c.Close()
+	L.lcd_enabled = true
 
 	//Put it in "standby" mode initially
 	i_lcd.Clear()
