@@ -25,7 +25,8 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 	subject := fmt.Sprintf("%s Gate Notification", CONFIG.SiteName)
 	var gl GateLog
 	gl.TimeOpened = time.Now()
-	if code != nil {
+	gl.OpenedName = "unknown"
+	if code != nil && code.IsValid() {
 		msg = fmt.Sprintf(msg, code.Label)
 		var contacts []Contact
 		var err error
@@ -62,7 +63,6 @@ func OpenGateAndNotify(acct *Account, code *AccountCode) error {
 		// Unknown who is opening the gate
 		gl.Success = false
 		gl.UsedWeb = false //if web is used, never get a failure/invalid
-		gl.OpenedName = "unknown"
 	}
 	// Snap a picture from the gate
 	gl.GatePicture = CAM.TakePicture()
